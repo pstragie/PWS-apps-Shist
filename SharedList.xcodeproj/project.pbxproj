@@ -8,22 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60411FA709B800402480 /* AppDelegate.swift */; };
-		F5AD60441FA709B800402480 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60431FA709B800402480 /* FirstViewController.swift */; };
-		F5AD60461FA709B800402480 /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60451FA709B800402480 /* SecondViewController.swift */; };
+		F5AD60441FA709B800402480 /* PersonalListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60431FA709B800402480 /* PersonalListsViewController.swift */; };
+		F5AD60461FA709B800402480 /* SharedListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60451FA709B800402480 /* SharedListsViewController.swift */; };
 		F5AD60491FA709B800402480 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5AD60471FA709B800402480 /* Main.storyboard */; };
 		F5AD604B1FA709B800402480 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5AD604A1FA709B800402480 /* Assets.xcassets */; };
 		F5AD604E1FA709B800402480 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5AD604C1FA709B800402480 /* LaunchScreen.storyboard */; };
+		F5AD60561FA70CD400402480 /* CellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60551FA70CD400402480 /* CellModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		F5AD603E1FA709B800402480 /* SharedList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SharedList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5AD60411FA709B800402480 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F5AD60431FA709B800402480 /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
-		F5AD60451FA709B800402480 /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
+		F5AD60431FA709B800402480 /* PersonalListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalListsViewController.swift; sourceTree = "<group>"; };
+		F5AD60451FA709B800402480 /* SharedListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedListsViewController.swift; sourceTree = "<group>"; };
 		F5AD60481FA709B800402480 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F5AD604A1FA709B800402480 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F5AD604D1FA709B800402480 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F5AD604F1FA709B800402480 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F5AD60551FA70CD400402480 /* CellModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,12 +59,13 @@
 			isa = PBXGroup;
 			children = (
 				F5AD60411FA709B800402480 /* AppDelegate.swift */,
-				F5AD60431FA709B800402480 /* FirstViewController.swift */,
-				F5AD60451FA709B800402480 /* SecondViewController.swift */,
+				F5AD60431FA709B800402480 /* PersonalListsViewController.swift */,
+				F5AD60451FA709B800402480 /* SharedListsViewController.swift */,
 				F5AD60471FA709B800402480 /* Main.storyboard */,
 				F5AD604A1FA709B800402480 /* Assets.xcassets */,
 				F5AD604C1FA709B800402480 /* LaunchScreen.storyboard */,
 				F5AD604F1FA709B800402480 /* Info.plist */,
+				F5AD60551FA70CD400402480 /* CellModel.swift */,
 			);
 			path = SharedList;
 			sourceTree = "<group>";
@@ -140,9 +143,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F5AD60461FA709B800402480 /* SecondViewController.swift in Sources */,
+				F5AD60461FA709B800402480 /* SharedListsViewController.swift in Sources */,
 				F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */,
-				F5AD60441FA709B800402480 /* FirstViewController.swift in Sources */,
+				F5AD60441FA709B800402480 /* PersonalListsViewController.swift in Sources */,
+				F5AD60561FA70CD400402480 /* CellModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
