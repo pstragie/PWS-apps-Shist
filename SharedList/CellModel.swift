@@ -15,4 +15,7 @@ class ListsTableViewCell: UITableViewCell {
     
     static let reuseIdentifier = "ListsCell"
 
+    @IBOutlet var planned: UIButton!
+    @IBOutlet var done: UIButton!
+    @IBOutlet var listitem: UITextView!
 }
