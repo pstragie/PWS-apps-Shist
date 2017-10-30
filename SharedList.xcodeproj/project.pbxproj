@@ -15,6 +15,8 @@
 		F5AD604E1FA709B800402480 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5AD604C1FA709B800402480 /* LaunchScreen.storyboard */; };
 		F5AD60561FA70CD400402480 /* CellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60551FA70CD400402480 /* CellModel.swift */; };
 		F5AD60581FA744EC00402480 /* UserHeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60571FA744EC00402480 /* UserHeaderTableViewCell.swift */; };
+		F5AD605B1FA75C8200402480 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5AD605A1FA75C8200402480 /* CoreData.framework */; };
+		F5AD60611FA7884400402480 /* dataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F5AD605C1FA75CC700402480 /* dataModel.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		F5AD604F1FA709B800402480 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F5AD60551FA70CD400402480 /* CellModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellModel.swift; sourceTree = "<group>"; };
 		F5AD60571FA744EC00402480 /* UserHeaderTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserHeaderTableViewCell.swift; sourceTree = "<group>"; };
+		F5AD605A1FA75C8200402480 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		F5AD605D1FA75CC700402480 /* dataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = dataModel.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5AD605B1FA75C8200402480 /* CoreData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,8 +49,10 @@
 		F5AD60351FA709B800402480 = {
 			isa = PBXGroup;
 			children = (
+				F5AD605C1FA75CC700402480 /* dataModel.xcdatamodeld */,
 				F5AD60401FA709B800402480 /* SharedList */,
 				F5AD603F1FA709B800402480 /* Products */,
+				F5AD60591FA75C8100402480 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -71,6 +78,14 @@
 				F5AD60571FA744EC00402480 /* UserHeaderTableViewCell.swift */,
 			);
 			path = SharedList;
+			sourceTree = "<group>";
+		};
+		F5AD60591FA75C8100402480 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F5AD605A1FA75C8200402480 /* CoreData.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -147,6 +162,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F5AD60461FA709B800402480 /* SharedListsViewController.swift in Sources */,
+				F5AD60611FA7884400402480 /* dataModel.xcdatamodeld in Sources */,
 				F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */,
 				F5AD60581FA744EC00402480 /* UserHeaderTableViewCell.swift in Sources */,
 				F5AD60441FA709B800402480 /* PersonalListsViewController.swift in Sources */,
@@ -319,6 +335,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		F5AD605C1FA75CC700402480 /* dataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				F5AD605D1FA75CC700402480 /* dataModel.xcdatamodel */,
+			);
+			currentVersion = F5AD605D1FA75CC700402480 /* dataModel.xcdatamodel */;
+			name = dataModel.xcdatamodeld;
+			path = SharedList/dataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = F5AD60361FA709B800402480 /* Project object */;
 }

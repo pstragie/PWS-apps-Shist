@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class ListsTableViewCell: UITableViewCell {
+class CellModel: UITableViewCell {
     
     // MARK: - Properties
     
@@ -18,4 +18,12 @@ class ListsTableViewCell: UITableViewCell {
     @IBOutlet var planned: UIButton!
     @IBOutlet var done: UIButton!
     @IBOutlet var listitem: UITextView!
+    @IBOutlet var delete: UIButton!
+    
+    // MARK: - Initialization
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+    }
+
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="12141" systemVersion="16G29" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Contacts" representedClassName="Contacts" syncable="YES" codeGenerationType="class">
+        <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="groep" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="naam" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="voornaam" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="shared" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Shared" inverseName="contacts" inverseEntity="Shared" syncable="YES"/>
+    </entity>
+    <entity name="Personal" representedClassName="Personal" syncable="YES" codeGenerationType="class">
+        <attribute name="datum" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="done" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="header" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="item" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="list" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="planned" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="Shared" representedClassName="Shared" syncable="YES" codeGenerationType="class">
+        <attribute name="datum" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="header" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="item" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="list" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sharedPersons" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="contacts" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Contacts" inverseName="shared" inverseEntity="Contacts" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Contacts" positionX="153" positionY="-144" width="128" height="118"/>
+        <element name="Personal" positionX="-180" positionY="-150" width="128" height="135"/>
+        <element name="Shared" positionX="-29" positionY="-153" width="128" height="133"/>
+    </elements>
+</model>

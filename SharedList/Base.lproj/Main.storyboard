@@ -52,15 +52,26 @@
                                             <action selector="segButtonChanged:" destination="9pv-A4-QxB" eventType="valueChanged" id="dPA-En-fKN"/>
                                         </connections>
                                     </segmentedControl>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RWu-Z3-evg">
+                                        <rect key="frame" x="96.5" y="264" width="150" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="30" id="MRJ-ei-F41"/>
+                                            <constraint firstAttribute="width" constant="150" id="g6i-Yl-Y4q"/>
+                                        </constraints>
+                                        <state key="normal" title="Start adding items"/>
+                                        <connections>
+                                            <action selector="messageButton:" destination="9pv-A4-QxB" eventType="touchUpInside" id="KRZ-HK-XTP"/>
+                                        </connections>
+                                    </button>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="5cS-u7-Aef">
                                         <rect key="frame" x="0.0" y="52" width="343" height="506"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <prototypes>
-                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" showsReorderControl="YES" indentationWidth="10" reuseIdentifier="ListsCell" id="rjW-V9-qHt">
+                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" showsReorderControl="YES" indentationWidth="10" reuseIdentifier="ListsCell" editingAccessoryType="checkmark" id="rjW-V9-qHt">
                                                 <rect key="frame" x="0.0" y="28" width="343" height="44"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="rjW-V9-qHt" id="2NL-FT-n92">
-                                                    <rect key="frame" x="0.0" y="0.0" width="343" height="44"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="343" height="43.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Hsc-SO-w12">
@@ -126,7 +137,9 @@
                                 <color key="backgroundColor" red="0.063903102210000007" green="0.27393835900000002" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstItem="qRA-9F-0Qs" firstAttribute="leading" secondItem="HUw-7g-PM6" secondAttribute="leading" constant="1" id="DmR-qw-6n4"/>
+                                    <constraint firstItem="RWu-Z3-evg" firstAttribute="centerX" secondItem="HUw-7g-PM6" secondAttribute="centerX" id="GZj-hi-cCz"/>
                                     <constraint firstItem="5cS-u7-Aef" firstAttribute="top" secondItem="qRA-9F-0Qs" secondAttribute="bottom" constant="20" id="UBK-hE-USD"/>
+                                    <constraint firstItem="RWu-Z3-evg" firstAttribute="centerY" secondItem="HUw-7g-PM6" secondAttribute="centerY" id="YIS-qH-JJU"/>
                                     <constraint firstItem="5cS-u7-Aef" firstAttribute="leading" secondItem="HUw-7g-PM6" secondAttribute="leading" id="dh3-sL-E6f"/>
                                     <constraint firstAttribute="bottom" secondItem="5cS-u7-Aef" secondAttribute="bottom" id="e3g-ld-YKH"/>
                                     <constraint firstAttribute="trailing" secondItem="5cS-u7-Aef" secondAttribute="trailing" id="lU9-Rd-N9Q"/>
@@ -149,6 +162,7 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Personal" image="first" id="acW-dT-cKf" userLabel="Personal"/>
                     <connections>
+                        <outlet property="messageButton" destination="RWu-Z3-evg" id="IhN-xX-rMt"/>
                         <outlet property="segButtonTop" destination="qRA-9F-0Qs" id="30g-tp-FDN"/>
                         <outlet property="subview" destination="HUw-7g-PM6" id="v76-oU-BIL"/>
                         <outlet property="tableView" destination="5cS-u7-Aef" id="cgQ-zV-D9V"/>
