@@ -15,10 +15,9 @@ class CellModel: UITableViewCell {
     
     static let reuseIdentifier = "ListsCell"
 
-    @IBOutlet var planned: UIButton!
-    @IBOutlet var done: UIButton!
-    @IBOutlet var listitem: UITextView!
-    @IBOutlet var delete: UIButton!
+    @IBOutlet weak var planned: UIButton!
+    @IBOutlet weak var done: UIButton!
+    @IBOutlet weak var listitem: UILabel!
     
     // MARK: - Initialization
     
