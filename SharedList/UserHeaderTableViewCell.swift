@@ -7,18 +7,26 @@
 //
 
 import UIKit
+import Foundation
 
-
-protocol UserHeaderTableViewCellDelegate {
-    func didSelectUserHeaderTableViewCell(Selected: Bool, UserHeader: UserHeaderTableViewCell)
+protocol UserHeaderTableViewCellDelegate: class {
+    func didSelectUserHeaderTableViewCell(sender: UserHeaderTableViewCell, Selected: Bool)
+    func didTapBinHeader(sender: UserHeaderTableViewCell)
 }
 
 class UserHeaderTableViewCell: UITableViewCell {
-    var delegate: UserHeaderTableViewCellDelegate?
-    
-    var headerCellSection:Int?
+    weak var delegate: UserHeaderTableViewCellDelegate?
     
     static let reuseIdentifier = "UserHeader"
+    var delegateCell: PersonalListsViewController?
+    var indexPath: IndexPath?
+    
+    @IBOutlet weak var delButton: UIButton!
+    @IBAction func delButton(_ sender: UIButton) {
+        delButton.setImage(#imageLiteral(resourceName: "bin"), for: .normal)
+        delButton.setImage(#imageLiteral(resourceName: "bin_open"), for: .highlighted)
+        delegate?.didTapBinHeader(sender: self)
+    }
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -27,26 +35,17 @@ class UserHeaderTableViewCell: UITableViewCell {
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-        
+        print("set selected")
         // Configure the view for the selected state
+        if selected == true {
+            delButton.isHidden = false
+        } else {
+            delButton.isHidden = true
+        }
+        
     }
     
     @IBAction func selectedHeader(sender: AnyObject) {
-        delegate?.didSelectUserHeaderTableViewCell(Selected: true, UserHeader: self)
-        print("Cell Selected")
-        // Set button frame
-        let frame: CGRect = sender.frame
-        let delButton: UIButton = UIButton(frame: CGRect(x: frame.size.width - 25, y: 10, width: 20, height: 20))
-        delButton.setTitle("-", for: .normal)
-        delButton.backgroundColor = UIColor.red
-        delButton.layer.cornerRadius = 10
-        sender.addSubview(delButton)
-        (sender as! UIButton).tintColor = UIColor.darkGray
-        delButton.isHidden = false
-    }
-    
-    @IBAction func notSelectedHeader(sender: AnyObject) {
-        delegate?.didSelectUserHeaderTableViewCell(Selected: false, UserHeader: self)
-        (sender as! UIButton).tintColor = UIColor.lightGray
+        delegate?.didSelectUserHeaderTableViewCell(sender: self, Selected: true)        
     }
 }

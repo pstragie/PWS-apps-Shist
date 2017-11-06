@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F54977EC1FAD355C0047B538 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977EB1FAD355C0047B538 /* CoreDataManager.swift */; };
+		F54977EE1FAFC80E0047B538 /* PersonalDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977ED1FAFC80E0047B538 /* PersonalDetailViewController.swift */; };
+		F54977F01FAFDDA30047B538 /* MyPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977EF1FAFDDA30047B538 /* MyPickerView.swift */; };
 		F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60411FA709B800402480 /* AppDelegate.swift */; };
 		F5AD60441FA709B800402480 /* PersonalListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60431FA709B800402480 /* PersonalListsViewController.swift */; };
 		F5AD60461FA709B800402480 /* SharedListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60451FA709B800402480 /* SharedListsViewController.swift */; };
@@ -20,6 +23,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F54977EB1FAD355C0047B538 /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
+		F54977ED1FAFC80E0047B538 /* PersonalDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalDetailViewController.swift; sourceTree = "<group>"; };
+		F54977EF1FAFDDA30047B538 /* MyPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyPickerView.swift; sourceTree = "<group>"; };
 		F5AD603E1FA709B800402480 /* SharedList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SharedList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5AD60411FA709B800402480 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5AD60431FA709B800402480 /* PersonalListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalListsViewController.swift; sourceTree = "<group>"; };
@@ -68,7 +74,9 @@
 			isa = PBXGroup;
 			children = (
 				F5AD60411FA709B800402480 /* AppDelegate.swift */,
+				F54977EB1FAD355C0047B538 /* CoreDataManager.swift */,
 				F5AD60431FA709B800402480 /* PersonalListsViewController.swift */,
+				F54977ED1FAFC80E0047B538 /* PersonalDetailViewController.swift */,
 				F5AD60451FA709B800402480 /* SharedListsViewController.swift */,
 				F5AD60471FA709B800402480 /* Main.storyboard */,
 				F5AD604A1FA709B800402480 /* Assets.xcassets */,
@@ -76,6 +84,7 @@
 				F5AD604F1FA709B800402480 /* Info.plist */,
 				F5AD60551FA70CD400402480 /* CellModel.swift */,
 				F5AD60571FA744EC00402480 /* UserHeaderTableViewCell.swift */,
+				F54977EF1FAFDDA30047B538 /* MyPickerView.swift */,
 			);
 			path = SharedList;
 			sourceTree = "<group>";
@@ -165,8 +174,11 @@
 				F5AD60611FA7884400402480 /* dataModel.xcdatamodeld in Sources */,
 				F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */,
 				F5AD60581FA744EC00402480 /* UserHeaderTableViewCell.swift in Sources */,
+				F54977F01FAFDDA30047B538 /* MyPickerView.swift in Sources */,
 				F5AD60441FA709B800402480 /* PersonalListsViewController.swift in Sources */,
+				F54977EC1FAD355C0047B538 /* CoreDataManager.swift in Sources */,
 				F5AD60561FA70CD400402480 /* CellModel.swift in Sources */,
+				F54977EE1FAFC80E0047B538 /* PersonalDetailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
