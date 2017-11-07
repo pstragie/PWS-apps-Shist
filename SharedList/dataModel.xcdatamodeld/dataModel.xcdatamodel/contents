@@ -14,6 +14,7 @@
         <attribute name="header" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="item" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="iteminfo" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="listname" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="planned" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
     </entity>
     <entity name="Shared" representedClassName="Shared" syncable="YES" codeGenerationType="class">
@@ -22,13 +23,14 @@
         <attribute name="header" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="item" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="list" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="listname" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="planned" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="sharedPersons" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="contacts" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Contacts" inverseName="shared" inverseEntity="Contacts" syncable="YES"/>
     </entity>
     <elements>
         <element name="Contacts" positionX="153" positionY="-144" width="128" height="118"/>
-        <element name="Personal" positionX="-180" positionY="-150" width="128" height="150"/>
-        <element name="Shared" positionX="-29" positionY="-153" width="128" height="165"/>
+        <element name="Personal" positionX="-180" positionY="-150" width="128" height="165"/>
+        <element name="Shared" positionX="-29" positionY="-153" width="128" height="180"/>
     </elements>
 </model>

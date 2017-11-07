@@ -52,11 +52,12 @@ final class CoreDataManager {
     }
     
     // MARK: - save Attributes
-    func saveNewItem(entitynaam: String, header: String, item: String, planned: Bool, done: Bool) {
+    func saveNewItem(entitynaam: String, list: String, header: String, item: String, planned: Bool, done: Bool) {
         let moc = self.appDelegate.persistentContainer.viewContext
         print("saving new item...")
         
         if let newItem = createRecordForEntity(entitynaam, inManagedObjectContext: moc) {
+            newItem.setValue(list, forKey: "listname")
             newItem.setValue(header, forKey: "header")
             newItem.setValue(item, forKey: "item")
             newItem.setValue(planned, forKey: "planned")
@@ -161,6 +162,30 @@ final class CoreDataManager {
         return result
     }
     
+    func getListArray(_ entitynaam: String) -> Array<String> {
+        let moc = self.appDelegate.persistentContainer.viewContext
+        var listArray: Array<String> = []
+        
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: entitynaam)
+        request.resultType = .dictionaryResultType
+        request.propertiesToFetch = ["listname"]
+        request.returnsDistinctResults = true
+        
+        do {
+            let result = try moc.fetch(request)
+            let resultsDict = result as! [[String: String]]
+            for r in resultsDict {
+                listArray.append(r["listname"]!)
+            }
+        } catch {
+            print("error fetching: \(error.localizedDescription)")
+            return ["list 1"]
+        }
+        
+        return listArray
+
+        
+    }
     func getHeaderArray(_ entitynaam: String) -> Array<String> {
         let moc = self.appDelegate.persistentContainer.viewContext
         var headerArray: Array<String> = []

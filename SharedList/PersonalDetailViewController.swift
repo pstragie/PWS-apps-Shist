@@ -11,16 +11,17 @@ import UIKit
 
 class PersonalDetailViewController: UIViewController {
     
+    // MARK: - variables and constants
     let coreDelegate = CoreDataManager(modelName: "dataModel")
-
     weak var item: Personal?
     var planned: Bool?
     var done: Bool?
     var itemInfo: String?
     var itemDueDate: Date?
     var itemName: String?
-    
     var headers: Array<String> = []
+    
+    // MARK: - IBOutlets
     @IBOutlet weak var itemTitle: UILabel!
     @IBOutlet weak var editItemTitle: UITextField!
     @IBOutlet weak var editItemInfo: UITextView!
@@ -31,7 +32,9 @@ class PersonalDetailViewController: UIViewController {
     @IBOutlet weak var plannedButton: UIButton!
     @IBOutlet weak var saveButton: UIButton!
     @IBOutlet weak var cancelButton: UIButton!
-    
+    @IBOutlet weak var pickerTextField: UITextField!
+
+    // MARK: - IBActions
     @IBAction func delTapped(_ sender: UIButton) {
         delButton.setImage(#imageLiteral(resourceName: "bin"), for: .normal)
         delButton.setImage(#imageLiteral(resourceName: "bin_open"), for: .highlighted)
@@ -47,7 +50,6 @@ class PersonalDetailViewController: UIViewController {
             doneButton.setImage(#imageLiteral(resourceName: "checkbox-empty"), for: .normal)
         }
     }
-    @IBOutlet weak var pickerTextField: UITextField!
     @IBAction func plannedTapped(_ sender: UIButton) {
         if plannedButton.image(for: .normal) == #imageLiteral(resourceName: "checkbox-empty") {
             planned = true
@@ -61,7 +63,6 @@ class PersonalDetailViewController: UIViewController {
     }
     @IBAction func moveToSharedButton(_ sender: UIButton) {
     }
-   
     @IBAction func saveButtonTapped(_ sender: UIButton) {
         item?.planned = planned!
         item?.done = done!
@@ -76,16 +77,16 @@ class PersonalDetailViewController: UIViewController {
         coreDelegate.saveContext()
         //performSegue(withIdentifier: "unwindSegueToPersonalListView", sender: self)
     }
-    
     @IBAction func cancelButtonTapped(_ sender: UIButton) {
     }
     
-    
+    // MARK: - Life cycle
     override func viewDidLoad() {
         setupLayout()
         insertData()
     }
     
+    // MARK: - Functions
     func insertData() {
         headers = coreDelegate.getHeaderArray("Personal").sorted()
         itemTitle.text = item?.item
@@ -126,6 +127,7 @@ class PersonalDetailViewController: UIViewController {
         } 
     }
 }
+
 extension UITextField {
     func loadDropdownData(data: [String], selected: Int) {
         self.inputView = MyPickerView(pickerData: data, dropdownField: self, selected: selected)

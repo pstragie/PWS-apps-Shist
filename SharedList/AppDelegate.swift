@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var errorHandler: (Error) -> Void = {_ in }
     var appVersion: String = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)!
     var appBuild: String = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String)!
-    var itemdict: Dictionary<String, Dictionary<String,Dictionary<String, Bool>>> = ["shop 1": ["milk": ["planned": false, "done": false], "chocolate": ["planned": false, "done": false], "eggs": ["planned": false, "done": false]], "shop 2": ["dog food": ["planned": false, "done": false]]]
+    var itemdict: Dictionary<String,Dictionary<String, Dictionary<String,Dictionary<String, Bool>>>> = ["Lijst 1":["shop 1": ["milk": ["planned": false, "done": false], "chocolate": ["planned": false, "done": false], "eggs": ["planned": false, "done": false]], "shop 2": ["dog food": ["planned": false, "done": false]]]]
     // MARK: - persistentContainer
     lazy var persistentContainer: NSPersistentContainer = {
         //        print("Loading persistentContainer")
@@ -113,11 +113,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func loadDictIntoCoreData(entitynaam: String) {
-        for (header, values) in itemdict {
-            for (item, bools) in values {
-                let planned = bools["planned"]
-                let done = bools["done"]
-                CoreDataManager(modelName: "dataModel").saveNewItem(entitynaam: entitynaam, header: header, item: item, planned: planned!, done: done!)
+        for (list, itemlist) in itemdict {
+            for (header, values) in itemlist {
+                for (item, bools) in values {
+                    let planned = bools["planned"]
+                    let done = bools["done"]
+                    CoreDataManager(modelName: "dataModel").saveNewItem(entitynaam: entitynaam, list: list, header: header, item: item, planned: planned!, done: done!)
+                }
             }
         }
     }

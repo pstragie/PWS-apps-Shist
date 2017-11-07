@@ -29,6 +29,7 @@ class CellModel: UITableViewCell {
     @IBOutlet weak var listinfo: UILabel!
     @IBOutlet weak var delButton: UIButton!
 
+    @IBOutlet weak var itemCellView: UIView!
     @IBAction func delButton(_ sender: UIButton) {
         delButton.setImage(#imageLiteral(resourceName: "bin"), for: .normal)
         delButton.setImage(#imageLiteral(resourceName: "bin_open"), for: .highlighted)

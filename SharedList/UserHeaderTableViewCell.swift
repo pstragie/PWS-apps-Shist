@@ -17,10 +17,12 @@ protocol UserHeaderTableViewCellDelegate: class {
 class UserHeaderTableViewCell: UITableViewCell {
     weak var delegate: UserHeaderTableViewCellDelegate?
     
+    @IBOutlet weak var userHeaderView: UIView!
     static let reuseIdentifier = "UserHeader"
     var delegateCell: PersonalListsViewController?
     var indexPath: IndexPath?
     
+    @IBOutlet weak var editButton: UIButton!
     @IBOutlet weak var delButton: UIButton!
     @IBAction func delButton(_ sender: UIButton) {
         delButton.setImage(#imageLiteral(resourceName: "bin"), for: .normal)
@@ -28,6 +30,8 @@ class UserHeaderTableViewCell: UITableViewCell {
         delegate?.didTapBinHeader(sender: self)
     }
     
+    @IBAction func editTapped(_ sender: UIButton) {
+    }
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -38,8 +42,12 @@ class UserHeaderTableViewCell: UITableViewCell {
         print("set selected")
         // Configure the view for the selected state
         if selected == true {
+            userHeaderView.layer.backgroundColor = UIColor.Palette.blueVar3.cgColor
+            editButton.isHidden = false
             delButton.isHidden = false
         } else {
+            userHeaderView.layer.backgroundColor = UIColor.Palette.blueVar1.cgColor
+            editButton.isHidden = true
             delButton.isHidden = true
         }
         

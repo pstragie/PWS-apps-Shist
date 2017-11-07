@@ -12,31 +12,35 @@ import CoreData
 
 class PersonalListsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, SFSpeechRecognizerDelegate {
 
-    var moc: NSManagedObjectContext!
+    // MARK: - Variables and constants
+    
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let coreDelegate = CoreDataManager(modelName: "dataModel")
+    let localdata = UserDefaults.standard
+
+    var moc: NSManagedObjectContext!
     var listop: String = "List"
     var detailIndexPath: IndexPath?
     var previouslySelected: UserHeaderTableViewCell?
     var headerSelected:Bool = false
     var selectedHeader:String?
     var textFieldIsEmpty:Bool = true
-    @IBOutlet weak var topLabel: UILabel!
-    
-    
-    @IBOutlet weak var spokenTextView: UITextView!
     var segAttr = NSDictionary(object: UIFont(name: "Helvetica", size: 20.0)!, forKey: NSFontAttributeName as NSCopying)
-    
     var latestaddedHeader: String = ""
-    let localdata = UserDefaults.standard
     
+    // MARK: - IBOutlets
+    @IBOutlet weak var topLabel: UILabel!
+    @IBOutlet weak var spokenTextView: UITextView!
     @IBOutlet weak var subview: UIView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var inputview: UIView!
     @IBOutlet weak var input: UITextField!
-    
-    // MARK: - Add new header
     @IBOutlet weak var addHeader: UIButton!
+    @IBOutlet weak var addItem: UIButton!
+
+    @IBOutlet weak var tableItemView: UIView!
+    @IBOutlet weak var userHeaderView: UIView!
+    // MARK: - IBActions
     @IBAction func addHeader(_ sender: UIButton) {
         // Input
         let item = Personal(context: moc)
@@ -54,9 +58,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             // Nothing
         }
     }
-    
-    // MARK: Add new item
-    @IBOutlet weak var addItem: UIButton!
     @IBAction func addItem(_ sender: UIButton) {
         // Input
         let item = Personal(context: moc)
@@ -115,84 +116,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         
     }
     
-    func plannedChanged(index: IndexPath, bool: Bool) {
-        let item = coreDelegate.fetchedResultsController.object(at: index)
-        item.planned = bool
-        coreDelegate.saveContext()
-    }
-    
-    func doneChanged(index: IndexPath, bool: Bool) {
-        let item = coreDelegate.fetchedResultsController.object(at: index)
-        item.done = bool
-        coreDelegate.saveContext()
-    }
-    
-    // MARK: - Delete functions
-    func didTapBinItem(index: IndexPath) {
-        print("Bin tapped at: \(index)")
-        // Delete selected item
-        
-        let items = coreDelegate.fetchedResultsController.object(at: index as IndexPath)
-
-        let header = items.header
-        let item = items.item
-        let planned = items.planned
-        let done = items.done
-        coreDelegate.removeItem(entitynaam: "Personal", header: header!, item: item!, planned: planned, done: done)
-        latestaddedHeader = header!
-        performFetch()
-        // If last item in section is removed, add empty section
-        var result: Array<Any> = []
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
-        let predicate = NSPredicate(format: "header == %@", header!)
-        fetchRequest.predicate = predicate
-        do {
-            result = try moc.fetch(fetchRequest)
-        } catch {
-            print("Fetch did not work.")
-        }
-        if result.count == 0 {
-            let item = Personal(context: moc)
-            // Add empty section
-            item.header = header!
-            //item.datum = Date() as NSDate
-            //item.planned = false
-            //item.done = false
-            item.item = ""
-            
-            
-            headerSelected = false
-            coreDelegate.saveContext()
-
-            
-        } else {
-            // Do nothing
-        }
-        
-
-        performFetch()
-        
-        tableView.reloadData()
-    }
-    
-
-    
-    // MARK: - Speech recognition
-    @IBOutlet weak var micButton: UIButton!
-    
-    @IBAction func micButton(_ sender: UIButton) {
-        if audioEngine.isRunning {
-            audioEngine.stop()
-            recognitionRequest?.endAudio()
-            micButton.isEnabled = false
-            micButton.setTitle("Start Recording", for: .normal)
-        } else {
-            startRecording()
-            micButton.setTitle("Stop Recording", for: .normal)
-        }
-    }
-    
-    // MARK: - Load cycle
+    // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -235,7 +159,60 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         // Dispose of any resources that can be recreated.
     }
     
-    // MARK: - Perform fetch
+    // MARK: - Functions
+    func plannedChanged(index: IndexPath, bool: Bool) {
+        let item = coreDelegate.fetchedResultsController.object(at: index)
+        item.planned = bool
+        coreDelegate.saveContext()
+    }
+    
+    func doneChanged(index: IndexPath, bool: Bool) {
+        let item = coreDelegate.fetchedResultsController.object(at: index)
+        item.done = bool
+        coreDelegate.saveContext()
+    }
+    
+    func didTapBinItem(index: IndexPath) {
+        print("Bin tapped at: \(index)")
+        // Delete selected item
+        
+        let items = coreDelegate.fetchedResultsController.object(at: index as IndexPath)
+
+        let header = items.header
+        let item = items.item
+        let planned = items.planned
+        let done = items.done
+        coreDelegate.removeItem(entitynaam: "Personal", header: header!, item: item!, planned: planned, done: done)
+        latestaddedHeader = header!
+        performFetch()
+        // If last item in section is removed, add empty section
+        var result: Array<Any> = []
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
+        let predicate = NSPredicate(format: "header == %@", header!)
+        fetchRequest.predicate = predicate
+        do {
+            result = try moc.fetch(fetchRequest)
+        } catch {
+            print("Fetch did not work.")
+        }
+        if result.count == 0 {
+            let item = Personal(context: moc)
+            // Add empty section
+            item.header = header!
+            //item.datum = Date() as NSDate
+            //item.planned = false
+            //item.done = false
+            item.item = ""
+ 
+            headerSelected = false
+            coreDelegate.saveContext()
+        } else {
+            // Do nothing
+        }
+        performFetch()
+        tableView.reloadData()
+    }
+    
     func performFetch() {
         do {
             try coreDelegate.fetchedResultsController.performFetch()
@@ -244,7 +221,69 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             fatalError("Could not fetch records: \(fetchError)")
         }
     }
-    // MARK: - Speech Recognition
+    
+    func setupLayout() {
+        addHeader.titleLabel?.text = "+H"
+        input.addTarget(self, action: #selector(textFieldidChange(_:)), for: .editingChanged)
+        input.layer.borderColor = UIColor.Palette.brownVar4.cgColor
+        inputview.layer.backgroundColor = UIColor.Palette.brownVar3.cgColor
+        input.layer.borderWidth = 2
+        createGradient()
+        
+    }
+    
+    func configure(_ cell: CellModel, at indexPath: IndexPath) {
+        // Fetch item
+        let item = coreDelegate.fetchedResultsController.object(at: indexPath)
+        // Configure cell
+        cell.listitem.text = item.item
+    }
+    
+    func textFieldidChange(_ textField: UITextField) {
+        if input.text == "" {
+            textFieldIsEmpty = true
+        } else {
+            textFieldIsEmpty = false
+        }
+        
+        if textFieldIsEmpty == false {
+            addItem.isEnabled = true
+            addHeader.isEnabled = true
+        } else {
+            addItem.isEnabled = false
+            addHeader.isEnabled = false
+        }
+        
+    }
+    
+    func createGradient() {
+        let gradient = CAGradientLayer()
+        gradient.frame = view.bounds
+        gradient.colors = [UIColor.Palette.brownVar5.cgColor, UIColor.Palette.brownVar1.cgColor]
+        gradient.locations = [0.0, 0.5]
+        self.view.layer.insertSublayer(gradient, at: 0)
+        
+        let gradientInputView = CAGradientLayer()
+        gradientInputView.frame = inputview.bounds
+        gradientInputView.colors = [UIColor.black.cgColor, UIColor.brown.cgColor, UIColor.lightGray.cgColor]
+        gradientInputView.locations = [0.0, 0.01, 1.0]
+        //self.inputview.layer.insertSublayer(gradientInputView, at: 0)
+    }
+    
+    // MARK: - Speech recognition
+    @IBOutlet weak var micButton: UIButton!
+    @IBAction func micButton(_ sender: UIButton) {
+        if audioEngine.isRunning {
+            audioEngine.stop()
+            recognitionRequest?.endAudio()
+            micButton.isEnabled = false
+            micButton.setTitle("Start Recording", for: .normal)
+        } else {
+            startRecording()
+            micButton.setTitle("Stop Recording", for: .normal)
+        }
+    }
+    
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale.init(identifier: "en-US"))
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
@@ -339,62 +378,21 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             micButton.isEnabled = false
         }
     }
-    // MARK: - Layout
-    func setupLayout() {
-        addHeader.titleLabel?.text = "+H"
-        input.addTarget(self, action: #selector(textFieldidChange(_:)), for: .editingChanged)
-        input.layer.borderColor = UIColor.orange.cgColor
-        input.layer.borderWidth = 2
-        createGradient()
-        
-    }
-   
-    // MARK: - Text field and button behaviour
-    func textFieldidChange(_ textField: UITextField) {
-        if input.text == "" {
-            textFieldIsEmpty = true
-        } else {
-            textFieldIsEmpty = false
+    
+    func updateView() {
+        var hasItems = false
+        if let items = coreDelegate.fetchedResultsController.fetchedObjects {
+            hasItems = items.count > 0
         }
+        tableView.isHidden = !hasItems
         
-        if textFieldIsEmpty == false {
-            addItem.isEnabled = true
-            addHeader.isEnabled = true
-        } else {
-            addItem.isEnabled = false
-            addHeader.isEnabled = false
-        }
-        
+        //activityIndicatorView.stopAnimating()
     }
-    
-    
-    
-    // MARK: - Create gradient
-    func createGradient() {
-        let gradient = CAGradientLayer()
-        gradient.frame = view.bounds
-        gradient.colors = [UIColor.brown.cgColor, UIColor.white.cgColor]
-        gradient.locations = [0.0, 0.8]
-        self.view.layer.insertSublayer(gradient, at: 0)
-        
-        let gradientInputView = CAGradientLayer()
-        gradientInputView.frame = inputview.bounds
-        gradientInputView.colors = [UIColor.brown.cgColor, UIColor.brown.cgColor, UIColor.white.cgColor]
-        gradientInputView.locations = [0.0, 0.8, 0.99]
-        self.inputview.layer.insertSublayer(gradientInputView, at: 0)
-    }
-    
-    
 
-    
     // MARK: - Table view data source
     func numberOfSections(in tableView: UITableView) -> Int {
-        // Fetch all data and count number of different headers
         guard let sections = coreDelegate.fetchedResultsController.sections else { return 0 }
         return sections.count
-        
-//        let numberOfHeaders = coreDelegate.getHeaderArray("Personal").count
-//        return numberOfHeaders
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -408,7 +406,9 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         }
         headerCell.delegate = self
         headerCell.textLabel?.text = sectionInfo.name
-        headerCell.layer.backgroundColor = UIColor.lightGray.cgColor
+        headerCell.textLabel?.textColor = UIColor.white
+        headerCell.delButton.tintColor = UIColor.white
+        headerCell.editButton.tintColor = UIColor.white
         
         return headerCell
     }
@@ -416,19 +416,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 44
     }
-    
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        /*
-        let header = coreDelegate.getHeaderArray("Personal")
-        print("header: \(header)")
-        return header[section]
- */
-        guard let sectionInfo = coreDelegate.fetchedResultsController.sections?[section] else {
-            fatalError("Unexpected section")
-        }
-        return sectionInfo.name
-    }
-    
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // Get unique headers from core data
@@ -505,24 +492,28 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         }
         return cell
     }
+    
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
+    
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // TODO: - remove from core data
             let object = coreDelegate.fetchedResultsController.object(at: indexPath)
             moc.delete(object)
             do {
                 try moc.save()
                 tableView.reloadData()
-//                tableView.deleteRows(at: [indexPath], with: .fade)
             } catch {
                 print("Could not save.")
             }
             
         }
     }
+}
+
+extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetchedResultsControllerDelegate {
+    // MARK: - Controllers
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
         print("did change section")
         switch type {
@@ -534,6 +525,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             break
         }
     }
+    
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         print("an object changed")
         switch (type) {
@@ -559,13 +551,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         }
     }
     
-    func configure(_ cell: CellModel, at indexPath: IndexPath) {
-        // Fetch item
-        let item = coreDelegate.fetchedResultsController.object(at: indexPath)
-        // Configure cell
-        cell.listitem.text = item.item
-    }
-    
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.beginUpdates()
     }
@@ -574,18 +559,8 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         tableView.endUpdates()
         updateView()
     }
-    func updateView() {
-        var hasItems = false
-        if let items = coreDelegate.fetchedResultsController.fetchedObjects {
-            hasItems = items.count > 0
-        }
-        tableView.isHidden = !hasItems
-        
-        //activityIndicatorView.stopAnimating()
-    }
-}
-
-extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetchedResultsControllerDelegate {
+    
+    // MARK: - Header behaviour
     func didSelectUserHeaderTableViewCell(sender: UserHeaderTableViewCell, Selected: Bool) {
         print("Header Cell Selected")
         headerSelected = true
@@ -630,6 +605,7 @@ extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetche
         tableView.reloadData()
     }
 
+    // MARK: - Segue
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         switch segue.identifier! {
         case "segueToDetail":
@@ -656,4 +632,50 @@ extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetche
         dismiss(animated: true, completion: nil)
         didTapBinItem(index: detailIndexPath!)
     }
+}
+
+extension UIColor {
+    // MARK: hex converter (not working?)
+    func hexStringToUIColor(hex: String) -> UIColor {
+        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        if (cString.hasPrefix("#")) {
+            cString.remove(at: cString.startIndex)
+        }
+        if ((cString.characters.count) != 6) {
+            return UIColor.gray
+        }
+        var rgbValue:UInt32 = 0
+        Scanner(string: cString).scanHexInt32(&rgbValue)
+        
+        return UIColor(red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0, green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0, blue: CGFloat(rgbValue & 0x0000FF) / 255.0, alpha: CGFloat(1.0))
+    }
+    // MARK: Nested Types
+    struct Palette {
+        static let brownVar5 = UIColor(red: 127 / 255.0, green: 82 / 255.0, blue: 67 / 255.0, alpha: 1.0)
+        static let brownVar4 = UIColor(red: 113 / 255.0, green: 70 / 255.0, blue: 56 / 255.0, alpha: 1.0)
+        static let brownVar3 = UIColor(red: 105 / 255.0, green: 61 / 255.0, blue: 48 / 255.0, alpha: 1.0)
+        static let brownVar2 = UIColor(red: 97 / 255.0, green: 54 / 255.0, blue: 40 / 255.0, alpha: 1.0)
+        static let brownVar1 = UIColor(red: 87 / 255.0, green: 47 / 255.0, blue: 34 / 255.0, alpha: 1.0)
+        
+        static let beigeVar5 = UIColor(red: 87 / 255.0, green: 57 / 255.0, blue: 34 / 255.0, alpha: 1.0)
+        static let beigeVar4 = UIColor(red: 97 / 255.0, green: 65 / 255.0, blue: 40 / 255.0, alpha: 1.0)
+        static let beigeVar3 = UIColor(red: 105 / 255.0, green: 73 / 255.0, blue: 48 / 255.0, alpha: 1.0)
+        static let beigeVar2 = UIColor(red: 113 / 255.0, green: 81 / 255.0, blue: 56 / 255.0, alpha: 1.0)
+        static let beigeVar1 = UIColor(red: 127 / 255.0, green: 93 / 255.0, blue: 67 / 255.0, alpha: 1.0)
+        
+        static let blueVar5 = UIColor(red: 21 / 255.0, green: 54 / 255.0, blue: 51 / 255.0, alpha: 1.0)
+        static let blueVar4 = UIColor(red: 25 / 255.0, green: 59 / 255.0, blue: 57 / 255.0, alpha: 1.0)
+        static let blueVar3 = UIColor(red: 29 / 255.0, green: 68 / 255.0, blue: 62 / 255.0, alpha: 1.0)
+        static let blueVar2 = UIColor(red: 34 / 255.0, green: 70 / 255.0, blue: 67 / 255.0, alpha: 1.0)
+        static let blueVar1 = UIColor(red: 41 / 255.0, green: 78 / 255.0, blue: 75 / 255.0, alpha: 1.0)
+        
+        static let greenVar5 = UIColor(red: 24 / 255.0, green: 61 / 255.0, blue: 42 / 255.0, alpha: 1.0)
+        static let greenVar4 = UIColor(red: 28 / 255.0, green: 68 / 255.0, blue: 48 / 255.0, alpha: 1.0)
+        static let greenVar3 = UIColor(red: 33 / 255.0, green: 74 / 255.0, blue: 53 / 255.0, alpha: 1.0)
+        static let greenVar2 = UIColor(red: 39 / 255.0, green: 79 / 255.0, blue: 59 / 255.0, alpha: 1.0)
+        static let greenVar1 = UIColor(red: 47 / 255.0, green: 89 / 255.0, blue: 68 / 255.0, alpha: 1.0)
+        
+    }
+    
+    
 }
