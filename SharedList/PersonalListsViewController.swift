@@ -13,11 +13,14 @@ import CoreData
 class PersonalListsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, SFSpeechRecognizerDelegate {
 
     // MARK: - Variables and constants
+    weak var items: Lists?
+    var listName: String?
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let coreDelegate = CoreDataManager(modelName: "dataModel")
     let localdata = UserDefaults.standard
-
+    
+    
     var moc: NSManagedObjectContext!
     var listop: String = "List"
     var detailIndexPath: IndexPath?
@@ -29,6 +32,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     var latestaddedHeader: String = ""
     
     // MARK: - IBOutlets
+    @IBOutlet weak var pageTitle: UINavigationItem!
     @IBOutlet weak var topLabel: UILabel!
     @IBOutlet weak var spokenTextView: UITextView!
     @IBOutlet weak var subview: UIView!
@@ -40,18 +44,21 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
 
     @IBOutlet weak var tableItemView: UIView!
     @IBOutlet weak var userHeaderView: UIView!
+            
     // MARK: - IBActions
     @IBAction func addHeader(_ sender: UIButton) {
         // Input
-        let item = Personal(context: moc)
+        //let item = Personal(context: moc)
         if (input.text != "") {
-            item.header = input.text!
-            item.item = ""
+            let personalItem = Personal(context: moc)
+            personalItem.setValue(input.text!, forKey: "header")
+            personalItem.setValue("", forKey: "item")
+            items?.addToPersonal(personalItem)
             
             headerSelected = false
             latestaddedHeader = input.text!
             coreDelegate.saveContext()
-            performFetch()
+            performTheFetch()
             input.text = ""
             tableView.reloadData()
         } else {
@@ -60,55 +67,35 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     }
     @IBAction func addItem(_ sender: UIButton) {
         // Input
-        let item = Personal(context: moc)
+        //let item = Personal(context: moc)
         var header: String = ""
         if (input.text != "") { // Nothing happens when field is empty
-            item.item = input.text!
-            item.datum = Date() as NSDate
-            item.planned = false
-            item.done = false
+            let personalItem = Personal(context: moc)
+            personalItem.setValue(input.text!, forKey: "item")
+            personalItem.setValue(Date() as NSDate, forKey: "createdAt")
+            personalItem.setValue(false, forKey: "planned")
+            personalItem.setValue(false, forKey: "done")
+            
             if headerSelected == false {
                 print("header not selected")
                 if latestaddedHeader != "" { // Add item to last added header
                     header = latestaddedHeader
                 } else { // No header added
-                    header = "Shop 1"
+                    header = "Section 1"
                 }
             } else { // headerSelected == true
                 header = selectedHeader!
             }
-            item.header = header
+            personalItem.setValue(header, forKey: "header")
+            items?.addToPersonal(personalItem)
             // Check if the section was empty (item == nil) e.g. when a new section is added
-            var itemIsEmpty: Bool = false
-            var result: Array<Any> = []
-            var object: [NSManagedObject]
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
-            let subpredicate1 = NSPredicate(format: "item == %@", "")
-            let subpredicate2 = NSPredicate(format: "header == %@", header)
-            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpredicate1, subpredicate2])
-            fetchRequest.predicate = predicate
-            do {
-                result = try moc.fetch(fetchRequest)
-                
-            } catch {
-                print("Fetch did not work.")
-            }
-            if result.count == 1 {
-                itemIsEmpty = true
-            } else {
-                itemIsEmpty = false
-            }
-            if itemIsEmpty == true {
+            if itemIsEmpty(header: header) == true {
                 // Remove the empty item
-                object = coreDelegate.fetchRecordsForEntity("Personal", key: "item", arg: "", inManagedObjectContext: moc)
-                for o in object {
-                    moc.delete(o)
-                }
+                deleteWithPredicate(header: header, item: "")
             }
             input.text = ""
             coreDelegate.saveContext()
-            coreDelegate.printCoreData()
-            performFetch()
+            performTheFetch()
             tableView.reloadData()
         } else {
             // Nothing
@@ -129,14 +116,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        do {
-            try coreDelegate.fetchedResultsController.performFetch()
-        } catch {
-            let fetchError = error as NSError
-            fatalError("Could not fetch records: \(fetchError)")
-            //            print("Unable to Perform Fetch Request")
-            //            print("\(fetchError), \(fetchError.localizedDescription)")
-        }
+        performTheFetch()
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
@@ -161,61 +141,78 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     
     // MARK: - Functions
     func plannedChanged(index: IndexPath, bool: Bool) {
-        let item = coreDelegate.fetchedResultsController.object(at: index)
-        item.planned = bool
+        let personalItem = coreDelegate.fetchedResultsControllerPersonal.object(at: index)
+        //let personalItem = Personal(context: moc)
+        personalItem.setValue(bool, forKey: "planned")
         coreDelegate.saveContext()
     }
     
     func doneChanged(index: IndexPath, bool: Bool) {
-        let item = coreDelegate.fetchedResultsController.object(at: index)
-        item.done = bool
+        let personalItem = coreDelegate.fetchedResultsControllerPersonal.object(at: index)
+        //let personalItem = Personal(context: moc)
+        personalItem.setValue(bool, forKey: "done")
         coreDelegate.saveContext()
     }
     
     func didTapBinItem(index: IndexPath) {
         print("Bin tapped at: \(index)")
-        // Delete selected item
-        
-        let items = coreDelegate.fetchedResultsController.object(at: index as IndexPath)
-
-        let header = items.header
-        let item = items.item
-        let planned = items.planned
-        let done = items.done
-        coreDelegate.removeItem(entitynaam: "Personal", header: header!, item: item!, planned: planned, done: done)
-        latestaddedHeader = header!
-        performFetch()
+        // Delete selected item from Entity
+        let personalitem = coreDelegate.fetchedResultsControllerPersonal.object(at: index as IndexPath)
+        let header = personalitem.header!
+        let item = personalitem.item!
+        deleteWithPredicate(header: header, item: item)
+ 
+        //items?.removeFromPersonal(item)
+        //coreDelegate.saveContext()
+        latestaddedHeader = header
+        performTheFetch()
         // If last item in section is removed, add empty section
         var result: Array<Any> = []
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
-        let predicate = NSPredicate(format: "header == %@", header!)
-        fetchRequest.predicate = predicate
+        let fetchRequest2 = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
+        let predicate2 = NSPredicate(format: "header == %@", header)
+        fetchRequest2.predicate = predicate2
         do {
-            result = try moc.fetch(fetchRequest)
+            result = try moc.fetch(fetchRequest2)
         } catch {
             print("Fetch did not work.")
         }
         if result.count == 0 {
-            let item = Personal(context: moc)
+            print("result = 0")
+            let personalitem = Personal(context: moc)
             // Add empty section
-            item.header = header!
+            personalitem.header = header
             //item.datum = Date() as NSDate
             //item.planned = false
             //item.done = false
-            item.item = ""
- 
+            personalitem.item = ""
+            items?.addToPersonal(personalitem)
             headerSelected = false
+            do { try moc.save() } catch { print("not saved") }
             coreDelegate.saveContext()
         } else {
             // Do nothing
+            print("result is not 0: \(result.count)")
         }
-        performFetch()
+        performTheFetch()
         tableView.reloadData()
     }
     
-    func performFetch() {
+    func deleteWithPredicate(header: String, item: String) {
+        let subpred1 = NSPredicate(format: "header == %@", header)
+        let subpred2 = NSPredicate(format: "item == %@", item)
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpred1, subpred2])
+        coreDelegate.fetchedResultsControllerPersonal.fetchRequest.predicate = predicate
+        let fetchRequest = coreDelegate.fetchedResultsControllerPersonal.fetchRequest
+        if let result = try? moc.fetch(fetchRequest) {
+            for object in result {
+                moc.delete(object)
+            }
+        }
+    }
+    
+    func performTheFetch() {
         do {
-            try coreDelegate.fetchedResultsController.performFetch()
+            try coreDelegate.fetchedResultsControllerPersonal.performFetch()
         } catch {
             let fetchError = error as NSError
             fatalError("Could not fetch records: \(fetchError)")
@@ -223,6 +220,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func setupLayout() {
+        pageTitle.title = items?.listname
         addHeader.titleLabel?.text = "+H"
         input.addTarget(self, action: #selector(textFieldidChange(_:)), for: .editingChanged)
         input.layer.borderColor = UIColor.Palette.brownVar4.cgColor
@@ -234,7 +232,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     
     func configure(_ cell: CellModel, at indexPath: IndexPath) {
         // Fetch item
-        let item = coreDelegate.fetchedResultsController.object(at: indexPath)
+        let item = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
         // Configure cell
         cell.listitem.text = item.item
     }
@@ -256,6 +254,29 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         
     }
     
+    func itemIsEmpty(header: String) -> Bool {
+        var itemIsEmpty: Bool = false
+        var result: Array<Any> = []
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
+        let subpredicate1 = NSPredicate(format: "item == %@", "")
+        let subpredicate2 = NSPredicate(format: "header == %@", header)
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpredicate1, subpredicate2])
+        fetchRequest.predicate = predicate
+        do {
+            result = try moc.fetch(fetchRequest)
+            
+        } catch {
+            print("Fetch did not work.")
+        }
+        if result.count == 1 {
+            itemIsEmpty = true
+        } else {
+            itemIsEmpty = false
+        }
+        
+        return itemIsEmpty
+    }
+
     func createGradient() {
         let gradient = CAGradientLayer()
         gradient.frame = view.bounds
@@ -379,19 +400,39 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         }
     }
     
+    // MARK: - updateView
     func updateView() {
         var hasItems = false
-        if let items = coreDelegate.fetchedResultsController.fetchedObjects {
+        if let items = items?.personal {
+            print("items: \(items.count)")
             hasItems = items.count > 0
         }
         tableView.isHidden = !hasItems
         
         //activityIndicatorView.stopAnimating()
     }
-
+    
+    func filterForList() {
+        let subpred1 = NSPredicate(format: "lists.listname == %@", (items?.listname)!)
+        let subpred2 = NSPredicate(format: "lists.plist == true")
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpred1, subpred2])
+        coreDelegate.fetchedResultsControllerPersonal.fetchRequest.predicate = predicate
+        
+        do {
+            try coreDelegate.fetchedResultsControllerPersonal.performFetch()
+        } catch {
+            fatalError("Could not fetch")
+        }
+    }
     // MARK: - Table view data source
     func numberOfSections(in tableView: UITableView) -> Int {
-        guard let sections = coreDelegate.fetchedResultsController.sections else { return 0 }
+        filterForList()
+        
+        guard let sections = coreDelegate.fetchedResultsControllerPersonal.sections else {
+            print("no sections found")
+            return 0
+        }
+        print("sections count: \(sections.count)")
         return sections.count
     }
     
@@ -400,10 +441,12 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         guard let headerCell = tableView.dequeueReusableCell(withIdentifier: "UserHeader") as? UserHeaderTableViewCell else {
             fatalError("found nil")
         }
+        filterForList()
         // Get unique headers from core data!
-        guard let sectionInfo = coreDelegate.fetchedResultsController.sections?[section] else {
+        guard let sectionInfo = coreDelegate.fetchedResultsControllerPersonal.sections?[section] else {
             fatalError("Unexpected section")
         }
+        
         headerCell.delegate = self
         headerCell.textLabel?.text = sectionInfo.name
         headerCell.textLabel?.textColor = UIColor.white
@@ -419,33 +462,14 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // Get unique headers from core data
+        filterForList()
         
-        guard let sectionInfo = coreDelegate.fetchedResultsController.sections?[section] else { fatalError("Unexpected section") }
-        var count: Int
-        var itemIsEmpty: Bool = false
-        var result: Int = 0
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
-        let subpredicate1 = NSPredicate(format: "item == %@", "")
-        let subpredicate2 = NSPredicate(format: "header == %@", sectionInfo.name)
-        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpredicate1, subpredicate2])
-        fetchRequest.predicate = predicate
-        do {
-            result = try moc.fetch(fetchRequest).count
-            
-        } catch {
-            print("Batch delete did not work.")
+        let count = coreDelegate.fetchedResultsControllerPersonal.sections?[section].numberOfObjects
+        let header = coreDelegate.getHeaderArray("Personal", listname: (items?.listname)!).sorted()[section]
+        if itemIsEmpty(header: header) {
+            return count! - 1
         }
-        if result == 1 {
-            itemIsEmpty = true
-        } else {
-            itemIsEmpty = false
-        }
-        if sectionInfo.numberOfObjects == 1 && itemIsEmpty {
-            count = 0
-        } else {
-            count = sectionInfo.numberOfObjects
-        }
-        return count
+        return count!
             
     }
 
@@ -465,8 +489,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         cell.showsReorderControl = true
         
         // fetch items for correct header
-        
-        let item = coreDelegate.fetchedResultsController.object(at: indexPath)
+        let item = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
         let pl: Bool = item.planned
         let d: Bool = item.done
         if pl == false {
@@ -491,24 +514,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             cell.listinfo?.text = item.iteminfo
         }
         return cell
-    }
-    
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            let object = coreDelegate.fetchedResultsController.object(at: indexPath)
-            moc.delete(object)
-            do {
-                try moc.save()
-                tableView.reloadData()
-            } catch {
-                print("Could not save.")
-            }
-            
-        }
     }
 }
 
@@ -595,12 +600,7 @@ extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetche
             print("Batch delete did not work.")
         }
         
-        do {
-            try coreDelegate.fetchedResultsController.performFetch()
-        } catch {
-            let fetchError = error as NSError
-            fatalError("Could not fetch records: \(fetchError)")
-        }        
+        performTheFetch()
         
         tableView.reloadData()
     }
@@ -611,8 +611,11 @@ extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetche
         case "segueToDetail":
             let destination = segue.destination as! PersonalDetailViewController
             let indexPath = tableView.indexPathForSelectedRow!
-            let selectedObject = coreDelegate.fetchedResultsController.object(at: indexPath)
+            let selectedObject = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
             destination.item = selectedObject
+            filterForList()
+            let headers = coreDelegate.getHeaderArray("Personal", listname: (items?.listname)!)
+            destination.headerlist = headers
             detailIndexPath = indexPath
         default:
             break
@@ -620,16 +623,13 @@ extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetche
      
     }
     @IBAction func saveUnwindAction(unwindSegue: UIStoryboardSegue) {
-        dismiss(animated: true, completion: nil)
         
     }
     
     @IBAction func cancelUnwindAction(unwindSegue: UIStoryboardSegue) {
-        dismiss(animated: true, completion: nil)
     }
     
     @IBAction func deleteTappedUnwindAction(unwindSegue: UIStoryboardSegue) {
-        dismiss(animated: true, completion: nil)
         didTapBinItem(index: detailIndexPath!)
     }
 }

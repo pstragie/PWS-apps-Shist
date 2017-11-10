@@ -19,7 +19,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var errorHandler: (Error) -> Void = {_ in }
     var appVersion: String = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)!
     var appBuild: String = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String)!
-    var itemdict: Dictionary<String,Dictionary<String, Dictionary<String,Dictionary<String, Bool>>>> = ["Lijst 1":["shop 1": ["milk": ["planned": false, "done": false], "chocolate": ["planned": false, "done": false], "eggs": ["planned": false, "done": false]], "shop 2": ["dog food": ["planned": false, "done": false]]]]
+    var listArray: Array<String> = ["shopping", "to do", "phone calls to make"]
+    var itemArray: Array<Dictionary<String,Any>> = [["listname": "shopping", "header": "shop A", "item": "milk"], ["listname": "shopping", "header": "Urgent", "item": "chocolate"], ["listname": "shopping", "header": "shop A", "item": "eggs"], ["listname": "shopping", "header": "shopA", "item": "water", "planned": 0, "done": 1], ["listname": "shopping", "header": "pet shop", "item": "dog food", "planned": 0, "done": 0], ["listname": "to do", "header": "dad", "item": "dishes", "planned": 0, "done": 1], ["listname": "to do", "header": "dad", "item": "pick up kids from school", "planned": 0, "done": 0], ["listname": "phone calls to make", "header": "Before 5 pm", "item": "call the bank", "iteminfo": "555-thebank-321", "planned": 0, "done": 0], ["listname": "phone calls to make", "header": "Before 5 pm", "item": "order food", "iteminfo": "555-pizza-001"]]
     // MARK: - persistentContainer
     lazy var persistentContainer: NSPersistentContainer = {
         //        print("Loading persistentContainer")
@@ -53,21 +54,79 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         let moc = persistentContainer.viewContext
-        /*
+        
         if firstLaunch() == true {
-            seedPersistentStoreOnFirstLaunch(moc)
-        } else {
-            print("Not the first launch!")
+            let list = Lists(context: moc)
+            let pers = Personal(context: moc)
+            list.listname = "Winkellijst"
+            list.plist = true
+            pers.header = "Aldi"
+            pers.item = "Water"
+            
+            list.addToPersonal(pers)
+            do {
+                try moc.save()
+            } catch {
+                fatalError("Could not save")
+            }
+            
+            /*
+            // Delete the core data
+            let Entities = ["Lists", "Personal", "Shared", "Contacts"]
+            for E in Entities {
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: E)
+                let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+                do {
+                    try moc.execute(batchDeleteRequest)
+                    print("all data deleted from \(E)")
+                } catch {
+                    print("Batch delete did not work: \(E)")
+                }
+            }
+ */
+            // seedPersistentStore
+            //seedPersistentStoreOnFirstLaunch(moc)
+    /*
+            // Option 1
+                // Create new item
+            let items = NSEntityDescription.entity(forEntityName: "Personal", in: moc)
+            let newItem = NSManagedObject(entity: items!, insertInto: moc)
+            
+            newItem.setValue("Aldi", forKey: "header")
+            newItem.setValue("Koekjes", forKey: "item")
+            newItem.setValue("Winkelen", forKey: "listname")
+                // Create new list
+            let lists = NSEntityDescription.entity(forEntityName: "Lists", in: moc)
+            let newList = NSManagedObject(entity: lists!, insertInto: moc)
+            newList.setValue("Winkelen", forKey: "listname")
+            newList.setValue(true, forKey: "plist")
+            
+            newItem.setValue(NSSet(object: newList), forKey: "lists")
+            
+            do {
+                try newItem.managedObjectContext?.save()
+            } catch {
+                fatalError("Could not save")
+            }
+
+            // Option 2 werkt!
+            let list = Lists(context: moc)
+            let item = Personal(context: moc)
+            item.header = "Match"
+            item.item = "Suiker"
+            list.listname = "Winkellijst"
+            list.plist = true
+            item.lists = list
+            do {
+                try moc.save()
+            } catch {
+                fatalError("Could not save")
+            }
+ */
         }
-        */
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
-        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-        do {
-            try moc.execute(batchDeleteRequest)
-        } catch {
-            print("Batch delete did not work.")
-        }
-        seedPersistentStoreOnFirstLaunch(moc)
+        
+        
+        //preloadDBData()
         return true
     }
 
@@ -104,26 +163,91 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    func seedPersistentStoreOnFirstLaunch(_ managedObjectContext: NSManagedObjectContext) {
-            print("First Launch! Seed PersistentStore")
-            let Entities = ["Personal", "Shared"]
-            for entitynaam in Entities {
-                loadDictIntoCoreData(entitynaam: entitynaam)
+    // MARK: - createRecordForEntity
+    private func createRecordForEntity(_ entity: String, inManagedObjectContext managedObjectContext: NSManagedObjectContext) -> NSManagedObject? {
+        // Helpers
+        var result: NSManagedObject?
+        // Create Entity Description
+        let entityDescription = NSEntityDescription.entity(forEntityName: entity, in: managedObjectContext)
+        if let entityDescription = entityDescription {
+            // Create Managed Object
+            result = NSManagedObject(entity: entityDescription, insertInto: managedObjectContext)
         }
+        return result
     }
     
-    func loadDictIntoCoreData(entitynaam: String) {
-        for (list, itemlist) in itemdict {
-            for (header, values) in itemlist {
-                for (item, bools) in values {
-                    let planned = bools["planned"]
-                    let done = bools["done"]
-                    CoreDataManager(modelName: "dataModel").saveNewItem(entitynaam: entitynaam, list: list, header: header, item: item, planned: planned!, done: done!)
+    // MARK: - fetchRecordsForEntity
+    private func fetchRecordsForEntity(_ entity: String, key: String, arg: String, inManagedObjectContext managedObjectContext: NSManagedObjectContext) -> [NSManagedObject] {
+        // Create Fetch Request
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
+        let predicate = NSPredicate(format: "%K == %@", key, arg)
+        fetchRequest.predicate = predicate
+        // Helpers
+        var result = [NSManagedObject]()
+        
+        do {
+            // Execute Fetch Request
+            let records = try managedObjectContext.fetch(fetchRequest)
+            if let records = records as? [NSManagedObject] {
+                result = records
+            }
+        } catch {
+            print("Unable to fetch managed objects for entity \(entity).")
+        }
+        return result
+    }
+    // MARK: - preloadDBData Core Data stack
+    func preloadDBData() {
+        print("Preloading DB...")
+        let fileManager = FileManager.default
+        
+        if !fileManager.fileExists(atPath: NSPersistentContainer.defaultDirectoryURL().relativePath + "/dataModel.sqlite") {
+            print("Files do not exist!")
+            let sourceSqliteURLs = [URL(fileURLWithPath: Bundle.main.path(forResource: "dataModel", ofType: "sqlite")!), URL(fileURLWithPath: Bundle.main.path(forResource: "dataModel", ofType: "sqlite-wal")!), URL(fileURLWithPath: Bundle.main.path(forResource: "dataModel", ofType: "sqlite-shm")!)]
+            let destSqliteURLs = [URL(fileURLWithPath: NSPersistentContainer.defaultDirectoryURL().relativePath + "/dataMoel.sqlite"), URL(fileURLWithPath: NSPersistentContainer.defaultDirectoryURL().relativePath + "/dataModel.sqlite-wal"), URL(fileURLWithPath: NSPersistentContainer.defaultDirectoryURL().relativePath + "/dataModel.sqlite-shm")]
+            print("destination: \(destSqliteURLs)")
+            for index in 0 ..< sourceSqliteURLs.count {
+                do {
+                    try fileManager.copyItem(at: sourceSqliteURLs[index], to: destSqliteURLs[index])
+                    //                    print("Files Copied!")
+                } catch {
+                    fatalError("Could not copy sqlite to destination.")
                 }
             }
+            // MARK: Print UserDefaults
+            /*print("localdata: ", localdata)
+             for (key, value) in localdata.dictionaryRepresentation() {
+             print("\(key) = \(value) \n")
+             }*/
+        } else {
+            //            print("Files Exist!")
+            
+            let sourceSqliteURLs = [URL(fileURLWithPath: Bundle.main.path(forResource: "dataModel", ofType: "sqlite")!), URL(fileURLWithPath: Bundle.main.path(forResource: "dataModel", ofType: "sqlite-wal")!), URL(fileURLWithPath: Bundle.main.path(forResource: "dataModel", ofType: "sqlite-shm")!)]
+            let destSqliteURLs = [URL(fileURLWithPath: NSPersistentContainer.defaultDirectoryURL().relativePath + "/dataModel.sqlite"), URL(fileURLWithPath: NSPersistentContainer.defaultDirectoryURL().relativePath + "/dataModel.sqlite-wal"), URL(fileURLWithPath: NSPersistentContainer.defaultDirectoryURL().relativePath + "/dataModel.sqlite-shm")]
+            //                print("destination: \(destSqliteURLs)")
+            // Delete old db files
+            //                print("...deleting old sqlite files")
+            for index in 0 ..< sourceSqliteURLs.count {
+                do {
+                    try fileManager.removeItem(at: destSqliteURLs[index])
+                } catch {
+                    fatalError("Could not delete old sqlite files at destination")
+                }
+            }
+            // Copy new db files to destination
+            for index in 0 ..< sourceSqliteURLs.count {
+                do {
+                    try fileManager.copyItem(at: sourceSqliteURLs[index], to: destSqliteURLs[index])
+                } catch {
+                    fatalError("Could not copy sqlite to destination.")
+                }
+            }
+            //                print("Files Copied!")
+            //.copyUserDefaultsToUserData(managedObjectContext: persistentContainer.viewContext)
+            
         }
     }
-    
+
 }
 
 

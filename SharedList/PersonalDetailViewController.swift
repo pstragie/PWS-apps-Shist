@@ -14,12 +14,13 @@ class PersonalDetailViewController: UIViewController {
     // MARK: - variables and constants
     let coreDelegate = CoreDataManager(modelName: "dataModel")
     weak var item: Personal?
+    var headerlist: Array<String>?
+    var headers: Array<String> = []
     var planned: Bool?
     var done: Bool?
     var itemInfo: String?
     var itemDueDate: Date?
     var itemName: String?
-    var headers: Array<String> = []
     
     // MARK: - IBOutlets
     @IBOutlet weak var itemTitle: UILabel!
@@ -39,7 +40,7 @@ class PersonalDetailViewController: UIViewController {
         delButton.setImage(#imageLiteral(resourceName: "bin"), for: .normal)
         delButton.setImage(#imageLiteral(resourceName: "bin_open"), for: .highlighted)
         
-        dismiss(animated: true, completion: nil)
+        //dismiss(animated: true, completion: nil)
     }
     @IBAction func doneTapped(_ sender: UIButton) {
         if doneButton.image(for: .normal) == #imageLiteral(resourceName: "checkbox-empty") {
@@ -88,7 +89,8 @@ class PersonalDetailViewController: UIViewController {
     
     // MARK: - Functions
     func insertData() {
-        headers = coreDelegate.getHeaderArray("Personal").sorted()
+        print("headerlist: \(headerlist!)")
+        headers = (headerlist!).sorted()
         itemTitle.text = item?.item
         editItemInfo.text = item?.iteminfo
         let row = headers.index(of: (item?.header)!)

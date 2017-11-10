@@ -13,6 +13,7 @@ class ListCellModel: UITableViewCell {
     
     static let reuseIdentifier = "ListNames"
     
+    @IBOutlet weak var listContentView: UIView!
     @IBOutlet weak var listName: UILabel!
     
     // MARK: - Initialization
