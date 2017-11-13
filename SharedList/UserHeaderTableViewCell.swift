@@ -12,11 +12,13 @@ import Foundation
 protocol UserHeaderTableViewCellDelegate: class {
     func didSelectUserHeaderTableViewCell(sender: UserHeaderTableViewCell, Selected: Bool)
     func didTapBinHeader(sender: UserHeaderTableViewCell)
+    func didTapEditIcon(sender: UserHeaderTableViewCell)
 }
 
 class UserHeaderTableViewCell: UITableViewCell {
     weak var delegate: UserHeaderTableViewCellDelegate?
     
+    @IBOutlet weak var invisibleButton: UIButton!
     @IBOutlet weak var userHeaderView: UIView!
     static let reuseIdentifier = "UserHeader"
     var delegateCell: PersonalListsViewController?
@@ -31,6 +33,8 @@ class UserHeaderTableViewCell: UITableViewCell {
     }
     
     @IBAction func editTapped(_ sender: UIButton) {
+        print("UHTVC: edit tapped")
+        delegate?.didTapEditIcon(sender: self)
     }
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -45,15 +49,17 @@ class UserHeaderTableViewCell: UITableViewCell {
             userHeaderView.layer.backgroundColor = UIColor.Palette.blueVar3.cgColor
             editButton.isHidden = false
             delButton.isHidden = false
+            //self.sendSubview(toBack: invisibleButton)
         } else {
             userHeaderView.layer.backgroundColor = UIColor.Palette.blueVar1.cgColor
             editButton.isHidden = true
             delButton.isHidden = true
+            //self.bringSubview(toFront: invisibleButton)
         }
         
     }
     
-    @IBAction func selectedHeader(sender: AnyObject) {
+    @IBAction func selectedHeader(sender: UIButton) {
         delegate?.didSelectUserHeaderTableViewCell(sender: self, Selected: true)        
     }
 }

@@ -12,21 +12,21 @@ import UIKit
 class MyPickerView: UIPickerView, UIPickerViewDataSource, UIPickerViewDelegate {
     var pickerData: [String]!
     var pickerTextField: UITextField!
-    var selected: Int!
+    var rowSelection: Int!
     
-    init(pickerData: [String], dropdownField: UITextField, selected: Int) {
+    init(pickerData: [String], dropdownField: UITextField) {
         super.init(frame: CGRect.zero)
+        backgroundColor = UIColor.Palette.blueVar3
         
         self.pickerData = pickerData
         self.pickerTextField = dropdownField
-        self.selected = selected
         
         self.delegate = self
         self.dataSource = self
-        
+
         DispatchQueue.main.async(execute: {
             if pickerData.count != 0 {
-                self.pickerTextField.text = self.pickerData[selected]
+                self.pickerTextField.text = self.pickerData[0]
                 self.pickerTextField.isEnabled = true
             } else {
                 self.pickerTextField.text = nil
@@ -44,9 +44,6 @@ class MyPickerView: UIPickerView, UIPickerViewDataSource, UIPickerViewDelegate {
         return 1
     }
     
-    override func selectedRow(inComponent component: Int) -> Int {
-        return selected
-    }
     // Sets number of rows in the picker view
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return pickerData.count
@@ -59,8 +56,8 @@ class MyPickerView: UIPickerView, UIPickerViewDataSource, UIPickerViewDelegate {
     
     // When user selects an option, this function will set the text of the textfield to reflect
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        
         pickerTextField.text = pickerData[row]
+        pickerTextField.resignFirstResponder()
     }
-    
-    
 }

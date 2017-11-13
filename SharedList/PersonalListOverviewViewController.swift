@@ -50,6 +50,7 @@ class PersonalListOverviewViewController: UIViewController, UITableViewDataSourc
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
+        
         coreDelegate.saveContext()
     }
     override func viewDidAppear(_ animated: Bool) {

@@ -314,6 +314,7 @@
 				DEVELOPMENT_TEAM = HUS279SULR;
 				INFOPLIST_FILE = SharedList/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.PWS-apps.SharedList";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;

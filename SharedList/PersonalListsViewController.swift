@@ -20,16 +20,25 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     let coreDelegate = CoreDataManager(modelName: "dataModel")
     let localdata = UserDefaults.standard
     
-    
+    var selectedBellIndex: IndexPath?
+    var viewPickerViewReminder = UIView()
+    var pickerViewReminder: UIDatePicker!
+    var originalDateTime: Date?
+    var storedReminderDate: Date?
+    var newReminderDate: Date?
+    var chosenDateTime: Date?
     var moc: NSManagedObjectContext!
     var listop: String = "List"
     var detailIndexPath: IndexPath?
     var previouslySelected: UserHeaderTableViewCell?
     var headerSelected:Bool = false
-    var selectedHeader:String?
+    var selectedHeaderText:String?
     var textFieldIsEmpty:Bool = true
     var segAttr = NSDictionary(object: UIFont(name: "Helvetica", size: 20.0)!, forKey: NSFontAttributeName as NSCopying)
     var latestaddedHeader: String = ""
+    var changeHeaderView = UIView()
+    var sectionTitle: String?
+    var newSectionTitle: String?
     
     // MARK: - IBOutlets
     @IBOutlet weak var pageTitle: UINavigationItem!
@@ -46,6 +55,9 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     @IBOutlet weak var userHeaderView: UIView!
             
     // MARK: - IBActions
+    
+    
+
     @IBAction func addHeader(_ sender: UIButton) {
         // Input
         //let item = Personal(context: moc)
@@ -84,11 +96,11 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
                     header = "Section 1"
                 }
             } else { // headerSelected == true
-                header = selectedHeader!
+                header = selectedHeaderText!
             }
             personalItem.setValue(header, forKey: "header")
             items?.addToPersonal(personalItem)
-            // Check if the section was empty (item == nil) e.g. when a new section is added
+            // Check if the section was empty (item == "") e.g. when a new section is added
             if itemIsEmpty(header: header) == true {
                 // Remove the empty item
                 deleteWithPredicate(header: header, item: "")
@@ -116,23 +128,28 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        print("View Will Appear")
         performTheFetch()
+        tableView.reloadData()
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
+        print("View will disappear")
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        tableView.reloadData()
+        print("view did appear")
     }
     override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        print("view did layoutsubviews")
         updateView()
+        
         input.becomeFirstResponder()
         if input.text == "" {
             addHeader.isEnabled = false
             addItem.isEnabled = false
         }
-        tableView.reloadData()
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -154,6 +171,239 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         coreDelegate.saveContext()
     }
     
+    // MARK: Reminder
+    func didTapBellButton(index: IndexPath) {
+        // Show datePicker with buttons: remove, save, cancel
+        let personalItem = coreDelegate.fetchedResultsControllerPersonal.object(at: index)
+        selectedBellIndex = index
+        originalDateTime = personalItem.reminderDate! as Date?
+        self.pickerViewReminder.setDate(originalDateTime!, animated: true)
+        viewPickerViewReminder.isHidden = false
+    }
+    
+    func setupViewReminderDatePicker() {
+        print("setup view reminder")
+        self.viewPickerViewReminder.isHidden = true
+        self.viewPickerViewReminder.translatesAutoresizingMaskIntoConstraints = false
+        self.viewPickerViewReminder=UIView(frame:CGRect(x: 0, y: 30, width: self.view.bounds.width, height: 215))
+        self.view.addSubview(viewPickerViewReminder)
+        self.pickerViewReminder=UIDatePicker(frame:CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 160))
+        viewPickerViewReminder.layer.backgroundColor = UIColor.Palette.blueVar3.cgColor
+        pickerViewReminder.datePickerMode = .dateAndTime
+        
+        if originalDateTime != nil {
+            self.pickerViewReminder.setDate(originalDateTime!, animated: true)
+        } else {
+            // Not necessary: bellButton should be invisible
+        }
+        let doneButton = UIButton()
+        doneButton.setTitle("Save", for: .normal)
+        doneButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        doneButton.setTitleColor(.blue, for: .normal)
+        doneButton.setTitleColor(.red, for: .highlighted)
+        doneButton.backgroundColor = .white
+        doneButton.layer.cornerRadius = 8
+        doneButton.layer.borderWidth = 1
+        doneButton.layer.borderColor = UIColor.gray.cgColor
+        doneButton.showsTouchWhenHighlighted = true
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        let cancelButton = UIButton()
+        cancelButton.setTitle("Cancel", for: .normal)
+        cancelButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        cancelButton.setTitleColor(.blue, for: .normal)
+        cancelButton.setTitleColor(.red, for: .highlighted)
+        cancelButton.backgroundColor = .white
+        cancelButton.layer.cornerRadius = 8
+        cancelButton.layer.borderWidth = 1
+        cancelButton.layer.borderColor = UIColor.gray.cgColor
+        cancelButton.showsTouchWhenHighlighted = true
+        cancelButton.translatesAutoresizingMaskIntoConstraints = false
+        let removeButton = UIButton()
+        removeButton.setTitle("Remove", for: .normal)
+        removeButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        removeButton.setTitleColor(.blue, for: .normal)
+        removeButton.setTitleColor(.red, for: .highlighted)
+        removeButton.backgroundColor = .white
+        removeButton.layer.cornerRadius = 8
+        removeButton.layer.borderWidth = 1
+        removeButton.layer.borderColor = UIColor.gray.cgColor
+        removeButton.showsTouchWhenHighlighted = true
+        removeButton.translatesAutoresizingMaskIntoConstraints = false
+        let buttonStack = UIStackView(arrangedSubviews: [removeButton, doneButton, cancelButton])
+        buttonStack.axis = .horizontal
+        buttonStack.distribution = .fillEqually
+        buttonStack.alignment = .fill
+        buttonStack.translatesAutoresizingMaskIntoConstraints = true
+        removeButton.addTarget(self, action: #selector(reminderRemoveTapped), for: .touchUpInside)
+        doneButton.addTarget(self, action: #selector(reminderDoneTapped), for: .touchUpInside)
+        cancelButton.addTarget(self, action: #selector(reminderCancelTapped), for: .touchUpInside)
+        
+        let verStack = UIStackView(arrangedSubviews: [pickerViewReminder, buttonStack])
+        verStack.axis = .vertical
+        verStack.distribution = .fillProportionally
+        verStack.alignment = .fill
+        verStack.spacing = 5
+        verStack.translatesAutoresizingMaskIntoConstraints = false
+        self.viewPickerViewReminder.addSubview(verStack)
+        //Stackview Layout
+        let viewsDictionary = ["stackView": verStack]
+        let stackView_H = NSLayoutConstraint.constraints(withVisualFormat: "H:|-10-[stackView]-10-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDictionary)
+        let stackView_V = NSLayoutConstraint.constraints(withVisualFormat: "V:|-8-[stackView]-8-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDictionary)
+        
+        viewPickerViewReminder.addConstraints(stackView_H)
+        viewPickerViewReminder.addConstraints(stackView_V)
+        self.viewPickerViewReminder.isHidden = true
+    }
+
+    func reminderPickerChanged() {
+        chosenDateTime = self.pickerViewReminder.date
+    }
+    func reminderDoneTapped() {
+        self.viewPickerViewReminder.isHidden = true
+        let personalitem = coreDelegate.fetchedResultsControllerPersonal.object(at: selectedBellIndex!)
+
+        if chosenDateTime != nil {
+            newReminderDate = chosenDateTime!
+            if newReminderDate != nil {
+                storedReminderDate = newReminderDate!
+            }
+        } else {
+            if storedReminderDate == nil {
+                newReminderDate = originalDateTime!
+            } else {
+                newReminderDate = storedReminderDate!
+            }
+        }
+        if newReminderDate != nil {
+        personalitem.setValue(newReminderDate!, forKey: "reminderDate")
+        } else {
+            if storedReminderDate != nil {
+                items?.personal?.setValue(storedReminderDate!, forKey: "reminderDate")
+            } else {
+                items?.personal?.setValue(originalDateTime!, forKey: "reminderDate")
+            }
+        }
+        coreDelegate.saveContext()
+    }
+    
+    func reminderCancelTapped() {
+        self.viewPickerViewReminder.isHidden = true
+        if newReminderDate != nil {
+            self.pickerViewReminder.setDate(newReminderDate!, animated: true)
+        } else {
+            if originalDateTime != nil {
+                self.pickerViewReminder.setDate(originalDateTime!, animated: true)
+            } else {
+                storedReminderDate = items?.personal?.value(forKey: "reminderDate") as? Date
+                if storedReminderDate != nil {
+                    self.pickerViewReminder.setDate(storedReminderDate!, animated: true)
+                }
+                
+            }
+        }
+    }
+    
+    func reminderRemoveTapped() {
+        self.viewPickerViewReminder.isHidden = true
+        let personalitem = coreDelegate.fetchedResultsControllerPersonal.object(at: selectedBellIndex!)
+        personalitem.setValue(false, forKey: "reminderSet")
+        coreDelegate.saveContext()
+        tableView.reloadData()
+    }
+
+    func setupChangeHeaderField() {
+        print("setup change header view")
+        self.changeHeaderView.isHidden = true
+        self.changeHeaderView.translatesAutoresizingMaskIntoConstraints = false
+        self.changeHeaderView=UIView(frame: CGRect(x: 0, y: 30, width: self.view.bounds.width, height: 215))
+        self.view.addSubview(changeHeaderView)
+        self.changeHeaderView.layer.backgroundColor = UIColor.Palette.blueVar3.cgColor
+        /*
+        let labelVersion = UILabel()
+        labelVersion.text = "Versie: \(appVersion)"
+        labelVersion.font = UIFont.boldSystemFont(ofSize: 18)
+        labelVersion.textColor = UIColor.white
+        labelVersion.translatesAutoresizingMaskIntoConstraints = false
+ */
+        let headerLabel = UILabel()
+        headerLabel.text = "Header"
+        headerLabel.textColor = UIColor.white
+        headerLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        let newHeaderTextField = UITextField()
+        newHeaderTextField.tintColor = UIColor.Palette.blueVar5
+        newHeaderTextField.backgroundColor = UIColor.white
+        newHeaderTextField.placeholder = "Enter new header here"
+        newHeaderTextField.layer.borderColor = UIColor.Palette.blueVar5.cgColor
+        newHeaderTextField.layer.borderWidth = 2
+        newHeaderTextField.layer.cornerRadius = 5
+        newHeaderTextField.translatesAutoresizingMaskIntoConstraints = true
+        //newHeaderTextField.addTarget(self, action: #selector(newHeaderTextFieldChanged(_:)), for: .allEditingEvents)
+
+        let doneButton = UIButton()
+        doneButton.setTitle("Save", for: .normal)
+        doneButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        doneButton.setTitleColor(.blue, for: .normal)
+        doneButton.setTitleColor(.red, for: .highlighted)
+        doneButton.backgroundColor = .white
+        doneButton.layer.cornerRadius = 8
+        doneButton.layer.borderWidth = 1
+        doneButton.layer.borderColor = UIColor.gray.cgColor
+        doneButton.showsTouchWhenHighlighted = true
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        let cancelButton = UIButton()
+        cancelButton.setTitle("Cancel", for: .normal)
+        cancelButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        cancelButton.setTitleColor(.blue, for: .normal)
+        cancelButton.setTitleColor(.red, for: .highlighted)
+        cancelButton.backgroundColor = .white
+        cancelButton.layer.cornerRadius = 8
+        cancelButton.layer.borderWidth = 1
+        cancelButton.layer.borderColor = UIColor.gray.cgColor
+        cancelButton.showsTouchWhenHighlighted = true
+        cancelButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        let buttonStack = UIStackView(arrangedSubviews: [doneButton, cancelButton])
+        buttonStack.axis = .horizontal
+        buttonStack.distribution = .fillEqually
+        buttonStack.alignment = .fill
+        buttonStack.translatesAutoresizingMaskIntoConstraints = true
+        doneButton.addTarget(self, action: #selector(saveChangedHeader), for: .touchUpInside)
+        cancelButton.addTarget(self, action: #selector(cancelChangeHeader), for: .touchUpInside)
+        
+        let verStack = UIStackView(arrangedSubviews: [headerLabel, newHeaderTextField, buttonStack])
+        verStack.axis = .vertical
+        verStack.distribution = .fillProportionally
+        verStack.alignment = .fill
+        verStack.spacing = 5
+        verStack.translatesAutoresizingMaskIntoConstraints = false
+        self.changeHeaderView.addSubview(verStack)
+        //Stackview Layout
+        let viewsDictionary = ["stackView": verStack]
+        let stackView_H = NSLayoutConstraint.constraints(withVisualFormat: "H:|-10-[stackView]-10-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDictionary)
+        let stackView_V = NSLayoutConstraint.constraints(withVisualFormat: "V:|-8-[stackView]-8-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDictionary)
+        
+        changeHeaderView.addConstraints(stackView_H)
+        changeHeaderView.addConstraints(stackView_V)
+        self.changeHeaderView.isHidden = true
+        
+    }
+    func newHeaderTextFieldChanged(_ textField: UITextField) {
+        //newSectionTitle = textField.text!
+        
+    }
+    func saveChangedHeader() {
+        changeHeaderView.isHidden = true
+        items?.personal?.setValue(newSectionTitle, forKey: "header")
+        coreDelegate.saveContext()
+        performTheFetch()
+        tableView.reloadData()
+    }
+    
+    func cancelChangeHeader() {
+        changeHeaderView.isHidden = true
+    }
+    // MARK: Bin action
     func didTapBinItem(index: IndexPath) {
         print("Bin tapped at: \(index)")
         // Delete selected item from Entity
@@ -197,6 +447,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         tableView.reloadData()
     }
     
+    // MARK: Other
     func deleteWithPredicate(header: String, item: String) {
         let subpred1 = NSPredicate(format: "header == %@", header)
         let subpred2 = NSPredicate(format: "item == %@", item)
@@ -228,6 +479,18 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         input.layer.borderWidth = 2
         createGradient()
         
+        if items?.personal?.value(forKey: "reminderDate") != nil {
+            originalDateTime = items?.personal?.value(forKey: "reminderDate") as? Date
+        } else {
+            if items?.personal?.value(forKey: "duedate") == nil {
+                originalDateTime = Date()
+            } else {
+                originalDateTime = items?.personal?.value(forKey: "duedate") as? Date
+            }
+        }
+        setupViewReminderDatePicker()
+        setupChangeHeaderField()
+        self.pickerViewReminder.addTarget(self, action: #selector(reminderPickerChanged), for: .valueChanged)
     }
     
     func configure(_ cell: CellModel, at indexPath: IndexPath) {
@@ -404,7 +667,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     func updateView() {
         var hasItems = false
         if let items = items?.personal {
-            print("items: \(items.count)")
             hasItems = items.count > 0
         }
         tableView.isHidden = !hasItems
@@ -432,7 +694,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             print("no sections found")
             return 0
         }
-        print("sections count: \(sections.count)")
         return sections.count
     }
     
@@ -448,6 +709,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         }
         
         headerCell.delegate = self
+        headerCell.layoutMargins.left = 30
         headerCell.textLabel?.text = sectionInfo.name
         headerCell.textLabel?.textColor = UIColor.white
         headerCell.delButton.tintColor = UIColor.white
@@ -513,6 +775,12 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             cell.listinfo.isHidden = false
             cell.listinfo?.text = item.iteminfo
         }
+        if item.reminderSet == true {
+            cell.bellButton.isHidden = false
+        } else {
+            cell.bellButton.isHidden = true
+        }
+    
         return cell
     }
 }
@@ -569,7 +837,8 @@ extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetche
     func didSelectUserHeaderTableViewCell(sender: UserHeaderTableViewCell, Selected: Bool) {
         print("Header Cell Selected")
         headerSelected = true
-        selectedHeader = sender.textLabel?.text
+        selectedHeaderText = sender.textLabel?.text
+        
         if previouslySelected == nil {
             // run once
             previouslySelected = sender
@@ -605,6 +874,14 @@ extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetche
         tableView.reloadData()
     }
 
+    func didTapEditIcon(sender: UserHeaderTableViewCell) {
+        print("Edit icon tapped")
+        sectionTitle = sender.textLabel?.text
+        self.changeHeaderView.isHidden = false
+        
+    }
+    
+    
     // MARK: - Segue
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         switch segue.identifier! {
@@ -623,7 +900,8 @@ extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetche
      
     }
     @IBAction func saveUnwindAction(unwindSegue: UIStoryboardSegue) {
-        
+        tableView.reloadData()
+
     }
     
     @IBAction func cancelUnwindAction(unwindSegue: UIStoryboardSegue) {
