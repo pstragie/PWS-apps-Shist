@@ -15,9 +15,7 @@ class PersonalListOverviewViewController: UIViewController, UITableViewDataSourc
     let coreDelegate = CoreDataManager(modelName: "dataModel")
     let localdata = UserDefaults.standard
     var listItemIndexPath: IndexPath?
-    
-    var moc: NSManagedObjectContext!
-    
+        
     @IBOutlet weak var editButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
     
@@ -73,6 +71,7 @@ class PersonalListOverviewViewController: UIViewController, UITableViewDataSourc
     }
     
     func setupLayout() {
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyle.none
         tableView.isEditing = false
     }
     

@@ -31,10 +31,12 @@ class PersonalDetailViewController: UIViewController {
     var chosenDateTime: Date?
     var originalDueDate: Date?
     var newDueDate: Date?
+    var duedateSet: Bool?
     
     // MARK: - IBOutlets
     @IBOutlet weak var itemTitle: UILabel!
     @IBOutlet weak var editItemTitle: UITextField!
+    @IBOutlet weak var imageButton: UIButton!
     @IBOutlet weak var editItemInfo: UITextView!
     @IBOutlet weak var dueDatePicker: UIDatePicker!
     @IBOutlet weak var moveToSharedButton: UIButton!
@@ -50,6 +52,8 @@ class PersonalDetailViewController: UIViewController {
     @IBOutlet weak var segmentedYesNo: UISegmentedControl!
     // MARK: - IBActions
     
+    @IBAction func imageButtonTapped(_ sender: UIButton) {
+    }
     @IBAction func showPickerReminderTapped(_ sender: UIButton) {
         if viewPickerViewReminder.isHidden == false {
             showPickerReminder.setTitle("Show", for: .normal)
@@ -114,6 +118,7 @@ class PersonalDetailViewController: UIViewController {
             item?.item = editItemTitle.text!
         }
         item?.header = pickerTextField.text
+        item?.duedateSet = duedateSet!
         if dueDateCheckBoxButton.currentImage == #imageLiteral(resourceName: "checkbox-filled") {
             if newDueDate != nil {
                 item?.duedate = newDueDate! as NSDate
@@ -125,7 +130,6 @@ class PersonalDetailViewController: UIViewController {
         }
         if segmentedYesNo.selectedSegmentIndex == 1 {
             if newReminderDate != nil {
-                print("segment = 1, saving reminderdate: \(String(describing: newReminderDate))")
                 item?.reminderDate = newReminderDate! as NSDate
             }
         }
@@ -138,9 +142,11 @@ class PersonalDetailViewController: UIViewController {
         if dueDateCheckBoxButton.currentImage == #imageLiteral(resourceName: "checkbox-empty") {
             dueDateCheckBoxButton.setImage(#imageLiteral(resourceName: "checkbox-filled"), for: .normal)
             dueDatePicker.tintColor = UIColor.Palette.greenVar3
+            duedateSet = true
         } else {
             dueDateCheckBoxButton.setImage(#imageLiteral(resourceName: "checkbox-empty"), for: .normal)
             dueDatePicker.tintColor = UIColor.gray
+            duedateSet = false
         }
     }
     
@@ -149,12 +155,10 @@ class PersonalDetailViewController: UIViewController {
         super.viewDidLoad()
         setupLayout()
         insertData()
-        print("originalDate: \(originalReminderDate!)")
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        print("viewDidLayoutSubviews")
         if segmentedYesNo.selectedSegmentIndex == 1 {
             showPickerReminder.isHidden = false
         } else {
@@ -162,7 +166,6 @@ class PersonalDetailViewController: UIViewController {
         }
     }
     override func viewWillLayoutSubviews() {
-        print("view will layout subviews")
         super.viewWillLayoutSubviews()
         if viewPickerViewReminder.isHidden == true {
             self.showPickerReminder.setTitle("Show", for: .normal)
@@ -174,11 +177,16 @@ class PersonalDetailViewController: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        print("view will appear")
     }
+
     // MARK: - Functions
+    func setupLayout() {
+        editItemInfo.layer.borderColor = UIColor.lightGray.cgColor
+        editItemInfo.layer.borderWidth = 1
+        editItemTitle.addTarget(self, action: #selector(editItemTitleDidEndEditing(_:)), for: .editingDidEnd)
+    }
+
     func insertData() {
-        print("headerlist: \(headerlist!)")
         headers = (headerlist!).sorted()
         let hIndex = headers.index(of: (item?.header)!)
         let headerToMove = headers.remove(at: hIndex!)
@@ -223,6 +231,13 @@ class PersonalDetailViewController: UIViewController {
         self.pickerViewReminder.addTarget(self, action: #selector(reminderPickerChanged), for: .valueChanged)
         if item?.duedate != nil {
             originalDueDate = item?.duedate as Date?
+        } else {
+            originalDueDate = Date()
+        }
+        if item?.duedateSet == true {
+            duedateSet = true
+        } else {
+            duedateSet = false
         }
         if originalDueDate != nil {
             dueDatePicker.layer.borderColor = UIColor.Palette.greenVar3.cgColor
@@ -233,11 +248,6 @@ class PersonalDetailViewController: UIViewController {
             dueDatePicker.setDate(Date(), animated: false)
         }
         self.dueDatePicker.addTarget(self, action: #selector(dueDatePickerChanged), for: .valueChanged)
-    }
-    func setupLayout() {
-        editItemInfo.layer.borderColor = UIColor.lightGray.cgColor
-        editItemInfo.layer.borderWidth = 1
-        editItemTitle.addTarget(self, action: #selector(editItemTitleDidEndEditing(_:)), for: .editingDidEnd)
     }
     
     func editItemTitleDidEndEditing(_ textView: UITextView) {
@@ -251,6 +261,7 @@ class PersonalDetailViewController: UIViewController {
         } 
     }
     
+    // MARK: Reminder date Picker
     func setupViewReminderDatePicker() {
         print("setting up viewReminder")
         self.viewPickerViewReminder.isHidden = true
@@ -328,6 +339,7 @@ class PersonalDetailViewController: UIViewController {
         dueDatePicker.layer.borderColor = UIColor.Palette.greenVar3.cgColor
         dueDatePicker.layer.borderWidth = 1
         dueDateCheckBoxButton.setImage(#imageLiteral(resourceName: "checkbox-filled"), for: .normal)
+        duedateSet = true
     }
     
     func reminderDoneTapped() {
@@ -368,6 +380,25 @@ class PersonalDetailViewController: UIViewController {
             self.pickerViewReminder.setDate(newReminderDate!, animated: true)
         }
     }
+    
+    // MARK: - Segue
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        switch segue.identifier! {
+        case "segueToImage":
+            let destination = segue.destination as! ImageViewController
+            destination.objectPersonal = item
+        default:
+            break
+        }
+        
+    }
+    @IBAction func saveImageUnwindAction(unwindSegue: UIStoryboardSegue) {
+        
+    }
+    
+    @IBAction func cancelImageUnwindAction(unwindSegue: UIStoryboardSegue) {
+    }
+    
 }
 
 extension UITextField {

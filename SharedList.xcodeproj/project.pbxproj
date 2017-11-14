@@ -22,6 +22,9 @@
 		F5AD60581FA744EC00402480 /* UserHeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60571FA744EC00402480 /* UserHeaderTableViewCell.swift */; };
 		F5AD605B1FA75C8200402480 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5AD605A1FA75C8200402480 /* CoreData.framework */; };
 		F5AD60611FA7884400402480 /* dataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F5AD605C1FA75CC700402480 /* dataModel.xcdatamodeld */; };
+		F5B324291FBA6BAC000FC5EF /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B324281FBA6BAB000FC5EF /* StoreKit.framework */; };
+		F5B3242B1FBA6D7B000FC5EF /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B3242A1FBA6D7B000FC5EF /* UserNotifications.framework */; };
+		F5B3242D1FBA7E3D000FC5EF /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B3242C1FBA7E3D000FC5EF /* ImageViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +45,10 @@
 		F5AD60571FA744EC00402480 /* UserHeaderTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserHeaderTableViewCell.swift; sourceTree = "<group>"; };
 		F5AD605A1FA75C8200402480 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		F5AD605D1FA75CC700402480 /* dataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = dataModel.xcdatamodel; sourceTree = "<group>"; };
+		F5B324271FBA6BA2000FC5EF /* SharedList.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SharedList.entitlements; sourceTree = "<group>"; };
+		F5B324281FBA6BAB000FC5EF /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		F5B3242A1FBA6D7B000FC5EF /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		F5B3242C1FBA7E3D000FC5EF /* ImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,7 +56,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5B3242B1FBA6D7B000FC5EF /* UserNotifications.framework in Frameworks */,
 				F5AD605B1FA75C8200402480 /* CoreData.framework in Frameworks */,
+				F5B324291FBA6BAC000FC5EF /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,11 +86,13 @@
 		F5AD60401FA709B800402480 /* SharedList */ = {
 			isa = PBXGroup;
 			children = (
+				F5B324271FBA6BA2000FC5EF /* SharedList.entitlements */,
 				F5AD60411FA709B800402480 /* AppDelegate.swift */,
 				F54977EB1FAD355C0047B538 /* CoreDataManager.swift */,
 				F54977F51FB137050047B538 /* PersonalListOverviewViewController.swift */,
 				F5AD60431FA709B800402480 /* PersonalListsViewController.swift */,
 				F54977ED1FAFC80E0047B538 /* PersonalDetailViewController.swift */,
+				F5B3242C1FBA7E3D000FC5EF /* ImageViewController.swift */,
 				F5AD60451FA709B800402480 /* SharedListsViewController.swift */,
 				F5AD60471FA709B800402480 /* Main.storyboard */,
 				F5AD604A1FA709B800402480 /* Assets.xcassets */,
@@ -98,6 +109,8 @@
 		F5AD60591FA75C8100402480 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F5B3242A1FBA6D7B000FC5EF /* UserNotifications.framework */,
+				F5B324281FBA6BAB000FC5EF /* StoreKit.framework */,
 				F5AD605A1FA75C8200402480 /* CoreData.framework */,
 			);
 			name = Frameworks;
@@ -137,6 +150,17 @@
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = HUS279SULR;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -186,6 +210,7 @@
 				F54977F61FB137050047B538 /* PersonalListOverviewViewController.swift in Sources */,
 				F54977EC1FAD355C0047B538 /* CoreDataManager.swift in Sources */,
 				F5AD60561FA70CD400402480 /* CellModel.swift in Sources */,
+				F5B3242D1FBA7E3D000FC5EF /* ImageViewController.swift in Sources */,
 				F54977EE1FAFC80E0047B538 /* PersonalDetailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -311,13 +336,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SharedList/SharedList.entitlements;
 				DEVELOPMENT_TEAM = HUS279SULR;
 				INFOPLIST_FILE = SharedList/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.PWS-apps.SharedList";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -325,12 +353,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SharedList/SharedList.entitlements;
 				DEVELOPMENT_TEAM = HUS279SULR;
 				INFOPLIST_FILE = SharedList/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.PWS-apps.SharedList";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

@@ -25,6 +25,7 @@
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="done" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="duedate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="duedateSet" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="header" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="item" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="iteminfo" optional="YES" attributeType="String" syncable="YES"/>
@@ -32,12 +33,22 @@
         <attribute name="planned" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="reminderDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="reminderSet" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="images" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Pimages" inverseName="personal" inverseEntity="Pimages" syncable="YES"/>
         <relationship name="lists" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Lists" inverseName="personal" inverseEntity="Lists" syncable="YES"/>
+    </entity>
+    <entity name="Pimages" representedClassName="Pimages" syncable="YES" codeGenerationType="class">
+        <attribute name="image" optional="YES" attributeType="String" allowsExternalBinaryDataStorage="YES" storedInTruthFile="YES" syncable="YES"/>
+        <attribute name="info" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="thumbnail" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="personal" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Personal" inverseName="images" inverseEntity="Personal" syncable="YES"/>
     </entity>
     <entity name="Shared" representedClassName="Shared" syncable="YES" codeGenerationType="class">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="done" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="duedate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="duedateSet" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="header" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="item" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="iteminfo" optional="YES" attributeType="String" syncable="YES"/>
@@ -45,12 +56,22 @@
         <attribute name="planned" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="reminderDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="reminderSet" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="images" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Simages" inverseName="shared" inverseEntity="Simages" syncable="YES"/>
         <relationship name="lists" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Lists" inverseName="shared" inverseEntity="Lists" syncable="YES"/>
+    </entity>
+    <entity name="Simages" representedClassName="Simages" syncable="YES" codeGenerationType="class">
+        <attribute name="image" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <attribute name="info" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="thumbnail" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <relationship name="shared" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Shared" inverseName="images" inverseEntity="Shared" syncable="YES"/>
     </entity>
     <elements>
         <element name="Contacts" positionX="-29" positionY="-103" width="128" height="148"/>
-        <element name="Personal" positionX="-191" positionY="-333" width="128" height="208"/>
-        <element name="Shared" positionX="142" positionY="-330" width="128" height="208"/>
+        <element name="Personal" positionX="-216" positionY="-441" width="128" height="238"/>
+        <element name="Shared" positionX="178" positionY="-450" width="128" height="238"/>
         <element name="Lists" positionX="-27" positionY="-337" width="128" height="193"/>
+        <element name="Pimages" positionX="-396" positionY="-414" width="128" height="133"/>
+        <element name="Simages" positionX="322" positionY="-315" width="128" height="118"/>
     </elements>
 </model>

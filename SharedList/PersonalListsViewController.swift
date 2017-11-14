@@ -39,6 +39,8 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     var changeHeaderView = UIView()
     var sectionTitle: String?
     var newSectionTitle: String?
+    var duedateSet: Bool?
+    var dueDateGradient: CAGradientLayer!
     
     // MARK: - IBOutlets
     @IBOutlet weak var pageTitle: UINavigationItem!
@@ -128,24 +130,21 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        print("View Will Appear")
+        input.becomeFirstResponder()
+
         performTheFetch()
         tableView.reloadData()
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        print("View will disappear")
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        print("view did appear")
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        print("view did layoutsubviews")
         updateView()
         
-        input.becomeFirstResponder()
         if input.text == "" {
             addHeader.isEnabled = false
             addItem.isEnabled = false
@@ -157,6 +156,32 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     // MARK: - Functions
+    func setupLayout() {
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyle.none
+        pageTitle.title = items?.listname
+        input.layer.cornerRadius = 10
+        addHeader.titleLabel?.text = "+H"
+        input.addTarget(self, action: #selector(textFielddidChange(_:)), for: .editingChanged)
+        input.layer.borderColor = UIColor.Palette.brownVar4.cgColor
+        inputview.layer.backgroundColor = UIColor.Palette.brownVar3.cgColor
+        input.layer.borderWidth = 2
+        createGradient()
+        
+        if items?.personal?.value(forKey: "reminderDate") != nil {
+            originalDateTime = items?.personal?.value(forKey: "reminderDate") as? Date
+        } else {
+            if items?.personal?.value(forKey: "duedate") == nil {
+                originalDateTime = Date()
+            } else {
+                originalDateTime = items?.personal?.value(forKey: "duedate") as? Date
+            }
+        }
+        duedateSet = items?.personal?.value(forKey: "duedateSet") as? Bool
+        setupViewReminderDatePicker()
+        setupChangeHeaderField()
+        self.pickerViewReminder.addTarget(self, action: #selector(reminderPickerChanged), for: .valueChanged)
+    }
+    
     func plannedChanged(index: IndexPath, bool: Bool) {
         let personalItem = coreDelegate.fetchedResultsControllerPersonal.object(at: index)
         //let personalItem = Personal(context: moc)
@@ -181,6 +206,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         viewPickerViewReminder.isHidden = false
     }
     
+    // MARK: Reminder date Picker
     func setupViewReminderDatePicker() {
         print("setup view reminder")
         self.viewPickerViewReminder.isHidden = true
@@ -311,6 +337,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         tableView.reloadData()
     }
 
+    // MARK: Change header field
     func setupChangeHeaderField() {
         print("setup change header view")
         self.changeHeaderView.isHidden = true
@@ -318,13 +345,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         self.changeHeaderView=UIView(frame: CGRect(x: 0, y: 30, width: self.view.bounds.width, height: 215))
         self.view.addSubview(changeHeaderView)
         self.changeHeaderView.layer.backgroundColor = UIColor.Palette.blueVar3.cgColor
-        /*
-        let labelVersion = UILabel()
-        labelVersion.text = "Versie: \(appVersion)"
-        labelVersion.font = UIFont.boldSystemFont(ofSize: 18)
-        labelVersion.textColor = UIColor.white
-        labelVersion.translatesAutoresizingMaskIntoConstraints = false
- */
+
         let headerLabel = UILabel()
         headerLabel.text = "Header"
         headerLabel.textColor = UIColor.white
@@ -332,14 +353,17 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         
         let newHeaderTextField = UITextField()
         newHeaderTextField.tintColor = UIColor.Palette.blueVar5
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: newHeaderTextField.bounds.height))
+        newHeaderTextField.leftView = paddingView
+        newHeaderTextField.leftViewMode = UITextFieldViewMode.always
         newHeaderTextField.backgroundColor = UIColor.white
         newHeaderTextField.placeholder = "Enter new header here"
         newHeaderTextField.layer.borderColor = UIColor.Palette.blueVar5.cgColor
         newHeaderTextField.layer.borderWidth = 2
         newHeaderTextField.layer.cornerRadius = 5
-        newHeaderTextField.translatesAutoresizingMaskIntoConstraints = true
-        //newHeaderTextField.addTarget(self, action: #selector(newHeaderTextFieldChanged(_:)), for: .allEditingEvents)
-
+        newHeaderTextField.translatesAutoresizingMaskIntoConstraints = false
+        newHeaderTextField.addTarget(self, action: #selector(newHeaderTextFieldChanged(_:)), for: .allEditingEvents)
+        
         let doneButton = UIButton()
         doneButton.setTitle("Save", for: .normal)
         doneButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
@@ -389,20 +413,74 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         
     }
     func newHeaderTextFieldChanged(_ textField: UITextField) {
-        //newSectionTitle = textField.text!
+        newSectionTitle = textField.text!
+        
         
     }
     func saveChangedHeader() {
         changeHeaderView.isHidden = true
-        items?.personal?.setValue(newSectionTitle, forKey: "header")
-        coreDelegate.saveContext()
+        input.becomeFirstResponder()
+        if newSectionTitle != "" {
+            items?.personal?.setValue(newSectionTitle, forKey: "header")
+            coreDelegate.saveContext()
+            performTheFetch()
+            tableView.reloadData()
+        }
+        
+    }
+    func cancelChangeHeader() {
+        input.becomeFirstResponder()
+        changeHeaderView.isHidden = true
+    }
+    // MARK: - Header behaviour
+    func didSelectUserHeaderTableViewCell(sender: UserHeaderTableViewCell, Selected: Bool) {
+        print("Header Cell Selected")
+        headerSelected = true
+        selectedHeaderText = sender.textLabel?.text
+        
+        if previouslySelected == nil {
+            // run once
+            previouslySelected = sender
+            sender.setSelected(true, animated: true)
+        } else {
+            // Previously selected header
+            previouslySelected?.setSelected(false, animated: true)
+            
+            // Currently selected header
+            sender.setSelected(true, animated: true)
+            
+            // Set the current header as the previous one
+            previouslySelected = sender
+        }
+    }
+    
+    func didTapBinHeader(sender: UserHeaderTableViewCell) {
+        print("Bin tapped")
+        // Delete selected header (and items)
+        let sectionTitle = sender.textLabel?.text
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
+        let predicate = NSPredicate(format: "header == %@", sectionTitle!)
+        fetchRequest.predicate = predicate
+        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        do {
+            try moc.execute(batchDeleteRequest)
+        } catch {
+            print("Batch delete did not work.")
+        }
+        
         performTheFetch()
+        
         tableView.reloadData()
     }
     
-    func cancelChangeHeader() {
-        changeHeaderView.isHidden = true
+    func didTapEditIcon(sender: UserHeaderTableViewCell) {
+        print("Edit icon tapped")
+        sectionTitle = sender.textLabel?.text
+        input.resignFirstResponder()
+        self.changeHeaderView.isHidden = false
+        
     }
+
     // MARK: Bin action
     func didTapBinItem(index: IndexPath) {
         print("Bin tapped at: \(index)")
@@ -460,7 +538,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             }
         }
     }
-    
     func performTheFetch() {
         do {
             try coreDelegate.fetchedResultsControllerPersonal.performFetch()
@@ -469,38 +546,13 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             fatalError("Could not fetch records: \(fetchError)")
         }
     }
-    
-    func setupLayout() {
-        pageTitle.title = items?.listname
-        addHeader.titleLabel?.text = "+H"
-        input.addTarget(self, action: #selector(textFieldidChange(_:)), for: .editingChanged)
-        input.layer.borderColor = UIColor.Palette.brownVar4.cgColor
-        inputview.layer.backgroundColor = UIColor.Palette.brownVar3.cgColor
-        input.layer.borderWidth = 2
-        createGradient()
-        
-        if items?.personal?.value(forKey: "reminderDate") != nil {
-            originalDateTime = items?.personal?.value(forKey: "reminderDate") as? Date
-        } else {
-            if items?.personal?.value(forKey: "duedate") == nil {
-                originalDateTime = Date()
-            } else {
-                originalDateTime = items?.personal?.value(forKey: "duedate") as? Date
-            }
-        }
-        setupViewReminderDatePicker()
-        setupChangeHeaderField()
-        self.pickerViewReminder.addTarget(self, action: #selector(reminderPickerChanged), for: .valueChanged)
-    }
-    
     func configure(_ cell: CellModel, at indexPath: IndexPath) {
         // Fetch item
         let item = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
         // Configure cell
         cell.listitem.text = item.item
     }
-    
-    func textFieldidChange(_ textField: UITextField) {
+    func textFielddidChange(_ textField: UITextField) {
         if input.text == "" {
             textFieldIsEmpty = true
         } else {
@@ -516,7 +568,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         }
         
     }
-    
     func itemIsEmpty(header: String) -> Bool {
         var itemIsEmpty: Bool = false
         var result: Array<Any> = []
@@ -539,7 +590,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         
         return itemIsEmpty
     }
-
+    
     func createGradient() {
         let gradient = CAGradientLayer()
         gradient.frame = view.bounds
@@ -596,7 +647,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         }
         }
     }
-    
     func startRecording() {
         if recognitionTask != nil {
             recognitionTask?.cancel()
@@ -654,7 +704,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         input.text = "Say something, I'm listening!"
         
     }
-    
     func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
         if available {
             micButton.isEnabled = true
@@ -673,7 +722,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         
         //activityIndicatorView.stopAnimating()
     }
-    
     func filterForList() {
         let subpred1 = NSPredicate(format: "lists.listname == %@", (items?.listname)!)
         let subpred2 = NSPredicate(format: "lists.plist == true")
@@ -686,6 +734,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             fatalError("Could not fetch")
         }
     }
+    
     // MARK: - Table view data source
     func numberOfSections(in tableView: UITableView) -> Int {
         filterForList()
@@ -714,7 +763,12 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         headerCell.textLabel?.textColor = UIColor.white
         headerCell.delButton.tintColor = UIColor.white
         headerCell.editButton.tintColor = UIColor.white
-        
+        headerCell.layer.shadowColor = UIColor.black.cgColor
+        headerCell.layer.shadowRadius = 5
+        headerCell.layer.shadowOffset = CGSize.zero
+        headerCell.layer.shadowOpacity = 0.50
+        headerCell.layer.masksToBounds = false
+        headerCell.clipsToBounds = false
         return headerCell
     }
     
@@ -734,13 +788,33 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         return count!
             
     }
-
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {        
+    }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CellModel.reuseIdentifier, for: indexPath) as? CellModel else {
             fatalError("Unexpected Index Path")
         }
-        
+        // Check if due date is imminent
+        let item = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
+        cell.cellView.layer.borderColor = UIColor.Palette.beigeVar1.cgColor
+        cell.cellView.layer.borderWidth = 1
+        cell.cellView.layer.cornerRadius = 5
+        if  item.duedateSet == true && item.done == false {
+            var dueInterval: Double = 0.0
+            let dueDate:NSDate = item.duedate!
+            dueInterval = dueDate.timeIntervalSinceNow
+            if dueInterval <= 86400 {
+                cell.cellView.layer.shadowColor = UIColor.purple.cgColor
+                cell.cellView.layer.shadowRadius = 6
+                cell.cellView.layer.shadowOffset = CGSize.zero
+                cell.cellView.layer.shadowOpacity = 0.99
+            } else {
+                //print("due date not imminent")
+            }
+        } else {
+            //print("due date not set")
+        }
         cell.delegateCell = self
         cell.indexPath = indexPath
         // Configure Cell
@@ -751,7 +825,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         cell.showsReorderControl = true
         
         // fetch items for correct header
-        let item = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
+        //let item = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
         let pl: Bool = item.planned
         let d: Bool = item.done
         if pl == false {
@@ -776,11 +850,20 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             cell.listinfo?.text = item.iteminfo
         }
         if item.reminderSet == true {
+            var reminderInterval: Double?
+            let remDate:NSDate = item.reminderDate!
+            reminderInterval = remDate.timeIntervalSinceNow
+            if reminderInterval! <= 0.0 {
+                cell.bellButton.setImage(#imageLiteral(resourceName: "bell ringing 40x40"), for: .normal)
+            } else {
+                cell.bellButton.setImage(#imageLiteral(resourceName: "bell 40x40"), for: .normal)
+            }
             cell.bellButton.isHidden = false
+            
         } else {
             cell.bellButton.isHidden = true
         }
-    
+        
         return cell
     }
 }
@@ -833,53 +916,6 @@ extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetche
         updateView()
     }
     
-    // MARK: - Header behaviour
-    func didSelectUserHeaderTableViewCell(sender: UserHeaderTableViewCell, Selected: Bool) {
-        print("Header Cell Selected")
-        headerSelected = true
-        selectedHeaderText = sender.textLabel?.text
-        
-        if previouslySelected == nil {
-            // run once
-            previouslySelected = sender
-            sender.setSelected(true, animated: true)
-        } else {
-            // Previously selected header
-            previouslySelected?.setSelected(false, animated: true)
-            
-            // Currently selected header
-            sender.setSelected(true, animated: true)
-            
-            // Set the current header as the previous one
-            previouslySelected = sender
-        }
-    }
-    
-    func didTapBinHeader(sender: UserHeaderTableViewCell) {
-        print("Bin tapped")
-        // Delete selected header (and items)
-        let sectionTitle = sender.textLabel?.text
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
-        let predicate = NSPredicate(format: "header == %@", sectionTitle!)
-        fetchRequest.predicate = predicate
-        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-        do {
-            try moc.execute(batchDeleteRequest)
-        } catch {
-            print("Batch delete did not work.")
-        }
-        
-        performTheFetch()
-        
-        tableView.reloadData()
-    }
-
-    func didTapEditIcon(sender: UserHeaderTableViewCell) {
-        print("Edit icon tapped")
-        sectionTitle = sender.textLabel?.text
-        self.changeHeaderView.isHidden = false
-        
-    }
     
     
     // MARK: - Segue
@@ -900,6 +936,7 @@ extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetche
      
     }
     @IBAction func saveUnwindAction(unwindSegue: UIStoryboardSegue) {
+        performTheFetch()
         tableView.reloadData()
 
     }
@@ -957,3 +994,35 @@ extension UIColor {
     
     
 }
+/*
+class RadialGradientLayer: CALayer {
+    override init(){
+        super.init()
+        needsDisplayOnBoundsChange = true
+    }
+    init(center:CGRect, radius:CGFloat, colors:[CGColor]){
+        self.center = center
+        self.radius = radius
+        self.colors = colors
+        super.init()
+    }
+    
+    required init(coder aDecoder: NSCoder) {
+        super.init()
+    }
+    
+    var center:CGRect = CGRect(x: 5, y: 5, width: 325, height: 44)
+    var radius:CGFloat = 5
+    var colors:[CGColor] = [UIColor.purple.cgColor, UIColor.white.cgColor]
+    
+    override func draw(in ctx: CGContext) {
+        ctx.saveGState()
+        var colorSpace = CGColorSpaceCreateDeviceRGB()
+        var locations:[CGFloat] = [0.0, 0.2]
+        var gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: [0.0, 0.2])
+        var startPoint = center
+        var endPoint = self.bounds
+        CGContextDrawRadialGradient(ctx, gradient!, center, 0.0, center, radius, 0)
+    }
+}
+*/

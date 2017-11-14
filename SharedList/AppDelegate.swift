@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import Foundation
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -69,64 +70,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             } catch {
                 fatalError("Could not save")
             }
-            
-            /*
-            // Delete the core data
-            let Entities = ["Lists", "Personal", "Shared", "Contacts"]
-            for E in Entities {
-                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: E)
-                let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-                do {
-                    try moc.execute(batchDeleteRequest)
-                    print("all data deleted from \(E)")
-                } catch {
-                    print("Batch delete did not work: \(E)")
-                }
-            }
- */
-            // seedPersistentStore
-            //seedPersistentStoreOnFirstLaunch(moc)
-    /*
-            // Option 1
-                // Create new item
-            let items = NSEntityDescription.entity(forEntityName: "Personal", in: moc)
-            let newItem = NSManagedObject(entity: items!, insertInto: moc)
-            
-            newItem.setValue("Aldi", forKey: "header")
-            newItem.setValue("Koekjes", forKey: "item")
-            newItem.setValue("Winkelen", forKey: "listname")
-                // Create new list
-            let lists = NSEntityDescription.entity(forEntityName: "Lists", in: moc)
-            let newList = NSManagedObject(entity: lists!, insertInto: moc)
-            newList.setValue("Winkelen", forKey: "listname")
-            newList.setValue(true, forKey: "plist")
-            
-            newItem.setValue(NSSet(object: newList), forKey: "lists")
-            
-            do {
-                try newItem.managedObjectContext?.save()
-            } catch {
-                fatalError("Could not save")
-            }
-
-            // Option 2 werkt!
-            let list = Lists(context: moc)
-            let item = Personal(context: moc)
-            item.header = "Match"
-            item.item = "Suiker"
-            list.listname = "Winkellijst"
-            list.plist = true
-            item.lists = list
-            do {
-                try moc.save()
-            } catch {
-                fatalError("Could not save")
-            }
- */
         }
         
+        // iOS 10 support
+        if #available(iOS 10, *) {
+            UNUserNotificationCenter.current().requestAuthorization(options:[.badge, .alert, .sound]) { (granted, error) in }
+            application.registerForRemoteNotifications()
+        }
         
-        //preloadDBData()
         return true
     }
 
@@ -247,7 +198,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
         }
     }
-
+    // Called when APNs has assigned the device a unique token
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        // Convert token to string
+        let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02X", $1)})
+        // Print it to console
+        print("APNs device token: \(deviceTokenString)")
+        
+        // Persist it in your backend in case it's new
+        UserDefaults.standard.set(deviceTokenString, forKey: "deviceTokenforPushMessages")
+    }
+    
+    // Called when APNs failed to register the device for push notifications
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        // Print the error to console (you should alert the user that the registration failed)
+        print("APNs registration failed: \(error)")
+    }
+    
+    // Push notification received
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        // Print notification payload data
+        print("Push notification received: \(userInfo)")
+    }
+    
+    
 }
 
 

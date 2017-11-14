@@ -29,6 +29,8 @@ class CellModel: UITableViewCell {
     @IBOutlet weak var listinfo: UILabel!
     @IBOutlet weak var delButton: UIButton!
 
+    @IBOutlet weak var cellView: UIView!
+    @IBOutlet weak var bckgroundView: UIView!
     @IBOutlet weak var bellButton: UIButton!
     @IBOutlet weak var itemCellView: UIView!
     
