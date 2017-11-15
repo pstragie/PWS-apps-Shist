@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import CoreLocation
 
 class PersonalListOverviewViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
@@ -15,15 +16,10 @@ class PersonalListOverviewViewController: UIViewController, UITableViewDataSourc
     let coreDelegate = CoreDataManager(modelName: "dataModel")
     let localdata = UserDefaults.standard
     var listItemIndexPath: IndexPath?
-        
+    var personalItemsViewController: PersonalListsViewController?
+    var locationManager: CLLocationManager!
     @IBOutlet weak var editButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
-    
-    @IBOutlet weak var accountButton: UIButton!
-    
-    @IBAction func accountButtonTapped(_ sender: UIButton) {
-    }
-    
     @IBAction func editButton(_ sender: UIButton) {
         if tableView.isEditing == true {
             tableView.isEditing = false
@@ -45,7 +41,16 @@ class PersonalListOverviewViewController: UIViewController, UITableViewDataSourc
         // self.clearsSelectionOnViewWillAppear = false
         
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+        
+        guard let splitViewController = splitViewController,
+            let navigationController = splitViewController.viewControllers.last as? UINavigationController,
+            let personalItemsViewController = navigationController.topViewController as? PersonalListsViewController else {
+                return
+        }
+        
+        self.personalItemsViewController = personalItemsViewController
+    
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
@@ -90,8 +95,15 @@ class PersonalListOverviewViewController: UIViewController, UITableViewDataSourc
         return lists.count
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let split = self.splitViewController {
+            let controllers = split.viewControllers
+            let itemListViewController = controllers[controllers.count-1] as? PersonalListsViewController
+            itemListViewController?.input.becomeFirstResponder()
+        }
+    }
     
-     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ListCellModel.reuseIdentifier, for: indexPath) as? ListCellModel else {
             fatalError("Unexpected Index Path")
         }
@@ -160,15 +172,18 @@ class PersonalListOverviewViewController: UIViewController, UITableViewDataSourc
         // Pass the selected object to the new view controller.
         switch segue.identifier! {
         case "segueToItems":
-            let destination = segue.destination as! PersonalListsViewController
+            let itemListNavigationController = segue.destination as? UINavigationController
+            let itemListViewController = itemListNavigationController?.topViewController as! PersonalListsViewController
             let indexPath = tableView.indexPathForSelectedRow!
             let selectedObject = coreDelegate.fetchedResultsControllerLists.object(at: indexPath)
-            destination.items = selectedObject
-        case "segueToLogin":
-            print("segue to login")
+            print("selectedObject: \(selectedObject), passed to itemlist")
+            itemListViewController.items = selectedObject
+            itemListViewController.navigationItem.leftBarButtonItem = self.splitViewController?.displayModeButtonItem
+            itemListViewController.navigationItem.leftItemsSupplementBackButton = true
         default:
             break
         }
+        
     }
     @IBAction func backUnwindAction(unwindSegue: UIStoryboardSegue) {
         dismiss(animated: true, completion: nil)

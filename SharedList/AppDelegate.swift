@@ -20,8 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var errorHandler: (Error) -> Void = {_ in }
     var appVersion: String = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)!
     var appBuild: String = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String)!
-    var listArray: Array<String> = ["shopping", "to do", "phone calls to make"]
-    var itemArray: Array<Dictionary<String,Any>> = [["listname": "shopping", "header": "shop A", "item": "milk"], ["listname": "shopping", "header": "Urgent", "item": "chocolate"], ["listname": "shopping", "header": "shop A", "item": "eggs"], ["listname": "shopping", "header": "shopA", "item": "water", "planned": 0, "done": 1], ["listname": "shopping", "header": "pet shop", "item": "dog food", "planned": 0, "done": 0], ["listname": "to do", "header": "dad", "item": "dishes", "planned": 0, "done": 1], ["listname": "to do", "header": "dad", "item": "pick up kids from school", "planned": 0, "done": 0], ["listname": "phone calls to make", "header": "Before 5 pm", "item": "call the bank", "iteminfo": "555-thebank-321", "planned": 0, "done": 0], ["listname": "phone calls to make", "header": "Before 5 pm", "item": "order food", "iteminfo": "555-pizza-001"]]
+    
     // MARK: - persistentContainer
     lazy var persistentContainer: NSPersistentContainer = {
         //        print("Loading persistentContainer")
@@ -54,22 +53,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        let moc = persistentContainer.viewContext
-        
+
         if firstLaunch() == true {
-            let list = Lists(context: moc)
-            let pers = Personal(context: moc)
-            list.listname = "Winkellijst"
-            list.plist = true
-            pers.header = "Aldi"
-            pers.item = "Water"
-            
-            list.addToPersonal(pers)
-            do {
-                try moc.save()
-            } catch {
-                fatalError("Could not save")
-            }
+            loadSomeItems()
         }
         
         // iOS 10 support
@@ -221,7 +207,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("Push notification received: \(userInfo)")
     }
     
-    
+    func loadSomeItems() {
+        print("preloading some data")
+        let moc = self.persistentContainer.viewContext
+        let list = Lists(context: moc)
+        let pers = Personal(context: moc)
+        let shar = Shared(context: moc)
+        list.listname = "Winkellijst"
+        list.plist = true
+        list.slist = true
+        pers.header = "Aldi"
+        pers.item = "Water"
+        shar.header = "Match"
+        shar.item = "Wine"
+        list.addToPersonal(pers)
+        list.addToShared(shar)
+        do {
+            try moc.save()
+        } catch {
+            fatalError("Could not save")
+        }
+        
+    }
 }
 
 

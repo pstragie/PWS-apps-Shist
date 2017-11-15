@@ -13,7 +13,14 @@ import CoreData
 class PersonalListsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, SFSpeechRecognizerDelegate {
 
     // MARK: - Variables and constants
-    weak var items: Lists?
+    var items: Lists! {
+        didSet {
+            if let _ = presentedViewController {
+                dismiss(animated: true, completion: nil)
+            }
+        }
+    }
+    //weak var items: Lists?
     var listName: String?
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -723,7 +730,12 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         //activityIndicatorView.stopAnimating()
     }
     func filterForList() {
-        let subpred1 = NSPredicate(format: "lists.listname == %@", (items?.listname)!)
+        let subpred1:NSPredicate
+        if items?.listname == nil {
+            subpred1 = NSPredicate(format: "lists.listname == %@", "Winkellijst")
+        } else {
+            subpred1 = NSPredicate(format: "lists.listname != %@", (items?.listname)!)
+        }
         let subpred2 = NSPredicate(format: "lists.plist == true")
         let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpred1, subpred2])
         coreDelegate.fetchedResultsControllerPersonal.fetchRequest.predicate = predicate
@@ -994,35 +1006,33 @@ extension UIColor {
     
     
 }
-/*
-class RadialGradientLayer: CALayer {
-    override init(){
-        super.init()
-        needsDisplayOnBoundsChange = true
-    }
-    init(center:CGRect, radius:CGFloat, colors:[CGColor]){
-        self.center = center
-        self.radius = radius
-        self.colors = colors
-        super.init()
+
+
+
+// MARK: - UISplitViewControllerDelegate
+extension PersonalListsViewController: UISplitViewControllerDelegate {
+    
+    func splitViewController(_ svc: UISplitViewController, willChangeTo displayMode: UISplitViewControllerDisplayMode) {
+        switch displayMode {
+        case .primaryHidden:
+            let barButtonItem = svc.displayModeButtonItem
+            barButtonItem.title = NSLocalizedString("Personal", comment: "Personal")
+            navigationItem.setLeftBarButton(barButtonItem, animated: true)
+        case.allVisible:
+            navigationItem.setLeftBarButton(nil, animated: true)
+        default:
+            break
+        }
     }
     
-    required init(coder aDecoder: NSCoder) {
-        super.init()
-    }
-    
-    var center:CGRect = CGRect(x: 5, y: 5, width: 325, height: 44)
-    var radius:CGFloat = 5
-    var colors:[CGColor] = [UIColor.purple.cgColor, UIColor.white.cgColor]
-    
-    override func draw(in ctx: CGContext) {
-        ctx.saveGState()
-        var colorSpace = CGColorSpaceCreateDeviceRGB()
-        var locations:[CGFloat] = [0.0, 0.2]
-        var gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: [0.0, 0.2])
-        var startPoint = center
-        var endPoint = self.bounds
-        CGContextDrawRadialGradient(ctx, gradient!, center, 0.0, center, radius, 0)
+    func splitViewController(_ splitController: UISplitViewController,
+                             collapseSecondary secondaryViewController: UIViewController,
+                             onto primaryViewController: UIViewController) -> Bool {
+        // Return true to indicate that the collapse has been handled by doing nothing.  The secondary controller will be discarded.
+        return true
     }
 }
-*/
+
+// MARK: - UINavigationControllerDelegate
+extension PersonalListsViewController: UINavigationControllerDelegate {
+}

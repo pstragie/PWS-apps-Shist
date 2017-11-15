@@ -12,8 +12,12 @@
 		F54977F01FAFDDA30047B538 /* MyPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977EF1FAFDDA30047B538 /* MyPickerView.swift */; };
 		F54977F41FB133740047B538 /* ListCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977F31FB133740047B538 /* ListCellModel.swift */; };
 		F54977F61FB137050047B538 /* PersonalListOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977F51FB137050047B538 /* PersonalListOverviewViewController.swift */; };
+		F55578831FBCE513003E0CC4 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = F55578821FBCE513003E0CC4 /* Model.swift */; };
+		F55578861FBCE574003E0CC4 /* Lijst.swift in Sources */ = {isa = PBXBuildFile; fileRef = F55578851FBCE574003E0CC4 /* Lijst.swift */; };
+		F55578881FBCE5AE003E0CC4 /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F55578871FBCE5AE003E0CC4 /* UserInfo.swift */; };
 		F5600C161FBBBE5000E25C62 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5600C151FBBBE5000E25C62 /* CloudKit.framework */; };
 		F5600C181FBBC57000E25C62 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5600C171FBBC57000E25C62 /* LoginViewController.swift */; };
+		F5600C1A1FBCAFFF00E25C62 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5600C191FBCAFFF00E25C62 /* SettingsViewController.swift */; };
 		F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60411FA709B800402480 /* AppDelegate.swift */; };
 		F5AD60441FA709B800402480 /* PersonalListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60431FA709B800402480 /* PersonalListsViewController.swift */; };
 		F5AD60461FA709B800402480 /* SharedListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60451FA709B800402480 /* SharedListsViewController.swift */; };
@@ -35,8 +39,12 @@
 		F54977EF1FAFDDA30047B538 /* MyPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyPickerView.swift; sourceTree = "<group>"; };
 		F54977F31FB133740047B538 /* ListCellModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListCellModel.swift; sourceTree = "<group>"; };
 		F54977F51FB137050047B538 /* PersonalListOverviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalListOverviewViewController.swift; sourceTree = "<group>"; };
+		F55578821FBCE513003E0CC4 /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		F55578851FBCE574003E0CC4 /* Lijst.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lijst.swift; sourceTree = "<group>"; };
+		F55578871FBCE5AE003E0CC4 /* UserInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		F5600C151FBBBE5000E25C62 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		F5600C171FBBC57000E25C62 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		F5600C191FBCAFFF00E25C62 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		F5AD603E1FA709B800402480 /* SharedList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SharedList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5AD60411FA709B800402480 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5AD60431FA709B800402480 /* PersonalListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalListsViewController.swift; sourceTree = "<group>"; };
@@ -70,6 +78,42 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F55578841FBCE529003E0CC4 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F55578821FBCE513003E0CC4 /* Model.swift */,
+				F55578871FBCE5AE003E0CC4 /* UserInfo.swift */,
+				F55578851FBCE574003E0CC4 /* Lijst.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		F5600C1B1FBCB05E00E25C62 /* Cell Models */ = {
+			isa = PBXGroup;
+			children = (
+				F54977F31FB133740047B538 /* ListCellModel.swift */,
+				F5AD60551FA70CD400402480 /* CellModel.swift */,
+				F5AD60571FA744EC00402480 /* UserHeaderTableViewCell.swift */,
+			);
+			name = "Cell Models";
+			sourceTree = "<group>";
+		};
+		F5600C1C1FBCBF9700E25C62 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F5AD604F1FA709B800402480 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F5600C1D1FBCBFB800E25C62 /* Class Models */ = {
+			isa = PBXGroup;
+			children = (
+				F54977EF1FAFDDA30047B538 /* MyPickerView.swift */,
+			);
+			name = "Class Models";
+			sourceTree = "<group>";
+		};
 		F5AD60351FA709B800402480 = {
 			isa = PBXGroup;
 			children = (
@@ -100,14 +144,14 @@
 				F5B3242C1FBA7E3D000FC5EF /* ImageViewController.swift */,
 				F5AD60451FA709B800402480 /* SharedListsViewController.swift */,
 				F5600C171FBBC57000E25C62 /* LoginViewController.swift */,
+				F5600C191FBCAFFF00E25C62 /* SettingsViewController.swift */,
+				F5AD604C1FA709B800402480 /* LaunchScreen.storyboard */,
 				F5AD60471FA709B800402480 /* Main.storyboard */,
 				F5AD604A1FA709B800402480 /* Assets.xcassets */,
-				F5AD604C1FA709B800402480 /* LaunchScreen.storyboard */,
-				F5AD604F1FA709B800402480 /* Info.plist */,
-				F54977F31FB133740047B538 /* ListCellModel.swift */,
-				F5AD60551FA70CD400402480 /* CellModel.swift */,
-				F5AD60571FA744EC00402480 /* UserHeaderTableViewCell.swift */,
-				F54977EF1FAFDDA30047B538 /* MyPickerView.swift */,
+				F55578841FBCE529003E0CC4 /* Models */,
+				F5600C1D1FBCBFB800E25C62 /* Class Models */,
+				F5600C1B1FBCB05E00E25C62 /* Cell Models */,
+				F5600C1C1FBCBF9700E25C62 /* Supporting Files */,
 			);
 			path = SharedList;
 			sourceTree = "<group>";
@@ -210,16 +254,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F55578831FBCE513003E0CC4 /* Model.swift in Sources */,
 				F5AD60461FA709B800402480 /* SharedListsViewController.swift in Sources */,
 				F54977F41FB133740047B538 /* ListCellModel.swift in Sources */,
 				F5AD60611FA7884400402480 /* dataModel.xcdatamodeld in Sources */,
 				F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */,
+				F55578881FBCE5AE003E0CC4 /* UserInfo.swift in Sources */,
 				F5AD60581FA744EC00402480 /* UserHeaderTableViewCell.swift in Sources */,
 				F54977F01FAFDDA30047B538 /* MyPickerView.swift in Sources */,
 				F5AD60441FA709B800402480 /* PersonalListsViewController.swift in Sources */,
 				F54977F61FB137050047B538 /* PersonalListOverviewViewController.swift in Sources */,
 				F54977EC1FAD355C0047B538 /* CoreDataManager.swift in Sources */,
+				F5600C1A1FBCAFFF00E25C62 /* SettingsViewController.swift in Sources */,
 				F5AD60561FA70CD400402480 /* CellModel.swift in Sources */,
+				F55578861FBCE574003E0CC4 /* Lijst.swift in Sources */,
 				F5B3242D1FBA7E3D000FC5EF /* ImageViewController.swift in Sources */,
 				F5600C181FBBC57000E25C62 /* LoginViewController.swift in Sources */,
 				F54977EE1FAFC80E0047B538 /* PersonalDetailViewController.swift in Sources */,
