@@ -19,6 +19,11 @@ class PersonalListOverviewViewController: UIViewController, UITableViewDataSourc
     @IBOutlet weak var editButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
     
+    @IBOutlet weak var accountButton: UIButton!
+    
+    @IBAction func accountButtonTapped(_ sender: UIButton) {
+    }
+    
     @IBAction func editButton(_ sender: UIButton) {
         if tableView.isEditing == true {
             tableView.isEditing = false
@@ -159,11 +164,19 @@ class PersonalListOverviewViewController: UIViewController, UITableViewDataSourc
             let indexPath = tableView.indexPathForSelectedRow!
             let selectedObject = coreDelegate.fetchedResultsControllerLists.object(at: indexPath)
             destination.items = selectedObject
+        case "segueToLogin":
+            print("segue to login")
         default:
             break
         }
     }
     @IBAction func backUnwindAction(unwindSegue: UIStoryboardSegue) {
+        dismiss(animated: true, completion: nil)
+    }
+    @IBAction func unwindFromLogin(unwindSegue: UIStoryboardSegue) {
+        dismiss(animated: true, completion: nil)
+    }
+    @IBAction func unwindFromLoginButtonTapped(unwindSegue: UIStoryboardSegue) {
         dismiss(animated: true, completion: nil)
     }
 }

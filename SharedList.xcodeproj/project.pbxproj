@@ -12,6 +12,8 @@
 		F54977F01FAFDDA30047B538 /* MyPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977EF1FAFDDA30047B538 /* MyPickerView.swift */; };
 		F54977F41FB133740047B538 /* ListCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977F31FB133740047B538 /* ListCellModel.swift */; };
 		F54977F61FB137050047B538 /* PersonalListOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977F51FB137050047B538 /* PersonalListOverviewViewController.swift */; };
+		F5600C161FBBBE5000E25C62 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5600C151FBBBE5000E25C62 /* CloudKit.framework */; };
+		F5600C181FBBC57000E25C62 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5600C171FBBC57000E25C62 /* LoginViewController.swift */; };
 		F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60411FA709B800402480 /* AppDelegate.swift */; };
 		F5AD60441FA709B800402480 /* PersonalListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60431FA709B800402480 /* PersonalListsViewController.swift */; };
 		F5AD60461FA709B800402480 /* SharedListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60451FA709B800402480 /* SharedListsViewController.swift */; };
@@ -33,6 +35,8 @@
 		F54977EF1FAFDDA30047B538 /* MyPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyPickerView.swift; sourceTree = "<group>"; };
 		F54977F31FB133740047B538 /* ListCellModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListCellModel.swift; sourceTree = "<group>"; };
 		F54977F51FB137050047B538 /* PersonalListOverviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalListOverviewViewController.swift; sourceTree = "<group>"; };
+		F5600C151FBBBE5000E25C62 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		F5600C171FBBC57000E25C62 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		F5AD603E1FA709B800402480 /* SharedList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SharedList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5AD60411FA709B800402480 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5AD60431FA709B800402480 /* PersonalListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalListsViewController.swift; sourceTree = "<group>"; };
@@ -57,6 +61,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F5B3242B1FBA6D7B000FC5EF /* UserNotifications.framework in Frameworks */,
+				F5600C161FBBBE5000E25C62 /* CloudKit.framework in Frameworks */,
 				F5AD605B1FA75C8200402480 /* CoreData.framework in Frameworks */,
 				F5B324291FBA6BAC000FC5EF /* StoreKit.framework in Frameworks */,
 			);
@@ -94,6 +99,7 @@
 				F54977ED1FAFC80E0047B538 /* PersonalDetailViewController.swift */,
 				F5B3242C1FBA7E3D000FC5EF /* ImageViewController.swift */,
 				F5AD60451FA709B800402480 /* SharedListsViewController.swift */,
+				F5600C171FBBC57000E25C62 /* LoginViewController.swift */,
 				F5AD60471FA709B800402480 /* Main.storyboard */,
 				F5AD604A1FA709B800402480 /* Assets.xcassets */,
 				F5AD604C1FA709B800402480 /* LaunchScreen.storyboard */,
@@ -109,6 +115,7 @@
 		F5AD60591FA75C8100402480 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F5600C151FBBBE5000E25C62 /* CloudKit.framework */,
 				F5B3242A1FBA6D7B000FC5EF /* UserNotifications.framework */,
 				F5B324281FBA6BAB000FC5EF /* StoreKit.framework */,
 				F5AD605A1FA75C8200402480 /* CoreData.framework */,
@@ -158,6 +165,9 @@
 								enabled = 1;
 							};
 							com.apple.Push = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
 								enabled = 1;
 							};
 						};
@@ -211,6 +221,7 @@
 				F54977EC1FAD355C0047B538 /* CoreDataManager.swift in Sources */,
 				F5AD60561FA70CD400402480 /* CellModel.swift in Sources */,
 				F5B3242D1FBA7E3D000FC5EF /* ImageViewController.swift in Sources */,
+				F5600C181FBBC57000E25C62 /* LoginViewController.swift in Sources */,
 				F54977EE1FAFC80E0047B538 /* PersonalDetailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
