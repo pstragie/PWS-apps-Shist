@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		F54977EC1FAD355C0047B538 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977EB1FAD355C0047B538 /* CoreDataManager.swift */; };
-		F54977EE1FAFC80E0047B538 /* PersonalDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977ED1FAFC80E0047B538 /* PersonalDetailViewController.swift */; };
+		F54977EE1FAFC80E0047B538 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977ED1FAFC80E0047B538 /* DetailViewController.swift */; };
 		F54977F01FAFDDA30047B538 /* MyPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977EF1FAFDDA30047B538 /* MyPickerView.swift */; };
 		F54977F41FB133740047B538 /* ListCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977F31FB133740047B538 /* ListCellModel.swift */; };
 		F54977F61FB137050047B538 /* PersonalListOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977F51FB137050047B538 /* PersonalListOverviewViewController.swift */; };
@@ -19,8 +19,8 @@
 		F5600C181FBBC57000E25C62 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5600C171FBBC57000E25C62 /* LoginViewController.swift */; };
 		F5600C1A1FBCAFFF00E25C62 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5600C191FBCAFFF00E25C62 /* SettingsViewController.swift */; };
 		F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60411FA709B800402480 /* AppDelegate.swift */; };
-		F5AD60441FA709B800402480 /* PersonalListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60431FA709B800402480 /* PersonalListsViewController.swift */; };
-		F5AD60461FA709B800402480 /* SharedListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60451FA709B800402480 /* SharedListsViewController.swift */; };
+		F5AD60441FA709B800402480 /* ItemListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60431FA709B800402480 /* ItemListViewController.swift */; };
+		F5AD60461FA709B800402480 /* SharedListOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60451FA709B800402480 /* SharedListOverviewViewController.swift */; };
 		F5AD60491FA709B800402480 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5AD60471FA709B800402480 /* Main.storyboard */; };
 		F5AD604B1FA709B800402480 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5AD604A1FA709B800402480 /* Assets.xcassets */; };
 		F5AD604E1FA709B800402480 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5AD604C1FA709B800402480 /* LaunchScreen.storyboard */; };
@@ -35,7 +35,7 @@
 
 /* Begin PBXFileReference section */
 		F54977EB1FAD355C0047B538 /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
-		F54977ED1FAFC80E0047B538 /* PersonalDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalDetailViewController.swift; sourceTree = "<group>"; };
+		F54977ED1FAFC80E0047B538 /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		F54977EF1FAFDDA30047B538 /* MyPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyPickerView.swift; sourceTree = "<group>"; };
 		F54977F31FB133740047B538 /* ListCellModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListCellModel.swift; sourceTree = "<group>"; };
 		F54977F51FB137050047B538 /* PersonalListOverviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalListOverviewViewController.swift; sourceTree = "<group>"; };
@@ -47,8 +47,8 @@
 		F5600C191FBCAFFF00E25C62 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		F5AD603E1FA709B800402480 /* SharedList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SharedList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5AD60411FA709B800402480 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F5AD60431FA709B800402480 /* PersonalListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalListsViewController.swift; sourceTree = "<group>"; };
-		F5AD60451FA709B800402480 /* SharedListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedListsViewController.swift; sourceTree = "<group>"; };
+		F5AD60431FA709B800402480 /* ItemListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemListViewController.swift; sourceTree = "<group>"; };
+		F5AD60451FA709B800402480 /* SharedListOverviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedListOverviewViewController.swift; sourceTree = "<group>"; };
 		F5AD60481FA709B800402480 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F5AD604A1FA709B800402480 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F5AD604D1FA709B800402480 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -139,10 +139,10 @@
 				F5AD60411FA709B800402480 /* AppDelegate.swift */,
 				F54977EB1FAD355C0047B538 /* CoreDataManager.swift */,
 				F54977F51FB137050047B538 /* PersonalListOverviewViewController.swift */,
-				F5AD60431FA709B800402480 /* PersonalListsViewController.swift */,
-				F54977ED1FAFC80E0047B538 /* PersonalDetailViewController.swift */,
+				F5AD60451FA709B800402480 /* SharedListOverviewViewController.swift */,
+				F5AD60431FA709B800402480 /* ItemListViewController.swift */,
+				F54977ED1FAFC80E0047B538 /* DetailViewController.swift */,
 				F5B3242C1FBA7E3D000FC5EF /* ImageViewController.swift */,
-				F5AD60451FA709B800402480 /* SharedListsViewController.swift */,
 				F5600C171FBBC57000E25C62 /* LoginViewController.swift */,
 				F5600C191FBCAFFF00E25C62 /* SettingsViewController.swift */,
 				F5AD604C1FA709B800402480 /* LaunchScreen.storyboard */,
@@ -255,14 +255,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				F55578831FBCE513003E0CC4 /* Model.swift in Sources */,
-				F5AD60461FA709B800402480 /* SharedListsViewController.swift in Sources */,
+				F5AD60461FA709B800402480 /* SharedListOverviewViewController.swift in Sources */,
 				F54977F41FB133740047B538 /* ListCellModel.swift in Sources */,
 				F5AD60611FA7884400402480 /* dataModel.xcdatamodeld in Sources */,
 				F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */,
 				F55578881FBCE5AE003E0CC4 /* UserInfo.swift in Sources */,
 				F5AD60581FA744EC00402480 /* UserHeaderTableViewCell.swift in Sources */,
 				F54977F01FAFDDA30047B538 /* MyPickerView.swift in Sources */,
-				F5AD60441FA709B800402480 /* PersonalListsViewController.swift in Sources */,
+				F5AD60441FA709B800402480 /* ItemListViewController.swift in Sources */,
 				F54977F61FB137050047B538 /* PersonalListOverviewViewController.swift in Sources */,
 				F54977EC1FAD355C0047B538 /* CoreDataManager.swift in Sources */,
 				F5600C1A1FBCAFFF00E25C62 /* SettingsViewController.swift in Sources */,
@@ -270,7 +270,7 @@
 				F55578861FBCE574003E0CC4 /* Lijst.swift in Sources */,
 				F5B3242D1FBA7E3D000FC5EF /* ImageViewController.swift in Sources */,
 				F5600C181FBBC57000E25C62 /* LoginViewController.swift in Sources */,
-				F54977EE1FAFC80E0047B538 /* PersonalDetailViewController.swift in Sources */,
+				F54977EE1FAFC80E0047B538 /* DetailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

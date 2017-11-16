@@ -1,5 +1,5 @@
 //
-//  PersonalDetailViewController.swift
+//  DetailViewController.swift
 //  SharedList
 //
 //  Created by Pieter Stragier on 05/11/2017.
@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class PersonalDetailViewController: UIViewController {
+class DetailViewController: UIViewController {
     
     // MARK: - variables and constants
     let coreDelegate = CoreDataManager(modelName: "dataModel")

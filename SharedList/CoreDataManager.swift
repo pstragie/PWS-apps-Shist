@@ -87,28 +87,21 @@ final class CoreDataManager {
         return result
     }
     // MARK: - add new list
-    func addNewPersonalList(_ entitynaam: String, input: String) {
+    func addNewList(_ entitynaam: String, input: String, storage: String) {
         let moc = self.appDelegate.persistentContainer.viewContext
         let list = Lists(context: moc)
         list.listname = input
-        list.plist = true
+        if storage == "personal" {
+            list.plist = true
+        } else {
+            list.slist = true
+        }
         do {
             try moc.save()
         } catch {
             fatalError("Could not save")
         }
-/*
-        if let newList = createRecordForEntity(entitynaam, inManagedObjectContext: moc) {
-            newList.setValue(input, forKey: "listname")
-            newList.setValue(true, forKey: "personal")
-        }
-        do {
-            try moc.save()
-            print("context saved")
-        } catch let error as NSError {
-            print("Could not save \(error), \(error.userInfo)")
-        }
-*/
+        saveContext()
     }
     // MARK: - save Attributes
     func saveNewItem(entitynaam: String, listname: String, personal: Bool, shared: Bool, header: String, item: String, planned: Bool, done: Bool) {

@@ -20,7 +20,7 @@ class CellModel: UITableViewCell {
     
     static let reuseIdentifier = "ListsCell"
     var plannedWasChecked: Bool = false
-    var delegateCell: PersonalListsViewController?
+    var delegateCell: ItemListViewController?
     var indexPath: IndexPath?
     
     @IBOutlet weak var planned: UIButton!

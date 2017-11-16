@@ -53,7 +53,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-
+        //splitViewController(splitViewController: PersonalListOverviewViewController, collapseSecondaryViewController: ItemListViewController, ontoPrimaryViewController: PersonalListOverviewViewController)
+        guard let tabBarController = window?.rootViewController as? UITabBarController,
+            let splitViewController = tabBarController.viewControllers?.first as? UISplitViewController,
+            let navigationController = splitViewController.viewControllers.last as? UINavigationController,
+            let detailViewController = navigationController.topViewController as? ItemListViewController else {
+                return true
+        }
+        
+        splitViewController.delegate = detailViewController
         if firstLaunch() == true {
             loadSomeItems()
         }
@@ -98,6 +106,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             return false
         }
+    }
+    
+    func splitViewController(splitViewController: UISplitViewController, collapseSecondaryViewController secondaryViewerController:UIViewController!, ontoPrimaryViewController primaryViewController:UIViewController!) -> Bool {
+        if let secondaryAsNavController = secondaryViewerController as? UINavigationController {
+            if let topAsDetailController = secondaryAsNavController.topViewController as? ItemListViewController {
+                if topAsDetailController.items == nil {
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
     
     // MARK: - createRecordForEntity
@@ -218,8 +238,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         list.slist = true
         pers.header = "Aldi"
         pers.item = "Water"
+        pers.listname = "Winkellijst"
         shar.header = "Match"
         shar.item = "Wine"
+        shar.listname = "Winkellijst"
         list.addToPersonal(pers)
         list.addToShared(shar)
         do {

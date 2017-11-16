@@ -1,5 +1,5 @@
 //
-//  PersonalListsViewController.swift
+//  ItemListViewController.swift
 //  SharedList
 //
 //  Created by Pieter Stragier on 30/10/2017.
@@ -10,19 +10,17 @@ import UIKit
 import Speech
 import CoreData
 
-class PersonalListsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, SFSpeechRecognizerDelegate {
+class ItemListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, SFSpeechRecognizerDelegate {
 
     // MARK: - Variables and constants
-    var items: Lists! {
+    
+    weak var items: Lists? {
         didSet {
-            if let _ = presentedViewController {
-                dismiss(animated: true, completion: nil)
-            }
+            self.configureView()
         }
     }
-    //weak var items: Lists?
     var listName: String?
-    
+    //let itemListViewController = ItemListViewController()
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let coreDelegate = CoreDataManager(modelName: "dataModel")
     let localdata = UserDefaults.standard
@@ -70,6 +68,88 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     @IBAction func addHeader(_ sender: UIButton) {
         // Input
         //let item = Personal(context: moc)
+        addNewHeader()
+    }
+    @IBAction func addItem(_ sender: UIButton) {
+        // Input
+        addNewItem()
+    }
+    
+    // MARK: - Life cycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureView()
+        // Do any additional setup after loading the view, typically from a nib.
+        moc = appDelegate.persistentContainer.viewContext
+        self.updateView()
+        setupLayout()
+        allowSpeech()
+        
+        
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        print("items: \(String(describing: items?.personal))")
+        listName = items?.listname!
+        tableView.reloadData()
+        input.becomeFirstResponder()
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+    }
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateView()
+        
+        if input.text == "" {
+            addHeader.isEnabled = false
+            addItem.isEnabled = false
+        }
+    }
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    // MARK: - Functions
+    func setupLayout() {
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyle.none
+        input.layer.cornerRadius = 10
+        addHeader.titleLabel?.text = "+H"
+        input.addTarget(self, action: #selector(textFielddidChange(_:)), for: .editingChanged)
+        input.layer.borderColor = UIColor.Palette.brownVar4.cgColor
+        inputview.layer.backgroundColor = UIColor.Palette.brownVar3.cgColor
+        input.layer.borderWidth = 2
+        createGradient()
+        
+        if items?.personal?.value(forKey: "reminderDate") != nil {
+            originalDateTime = items?.personal?.value(forKey: "reminderDate") as? Date
+        } else {
+            if items?.personal?.value(forKey: "duedate") == nil {
+                originalDateTime = Date()
+            } else {
+                originalDateTime = items?.personal?.value(forKey: "duedate") as? Date
+            }
+        }
+        duedateSet = items?.personal?.value(forKey: "duedateSet") as? Bool
+        setupViewReminderDatePicker()
+        setupChangeHeaderField()
+        self.pickerViewReminder.addTarget(self, action: #selector(reminderPickerChanged), for: .valueChanged)
+    }
+    
+    func configureView() {
+        // Update the user interface for the detail item.
+        if let item = self.items {
+            if let label = self.pageTitle {
+                label.title = item.listname
+            }
+        }
+    }
+    
+    func addNewHeader() {
         if (input.text != "") {
             let personalItem = Personal(context: moc)
             personalItem.setValue(input.text!, forKey: "header")
@@ -86,8 +166,8 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
             // Nothing
         }
     }
-    @IBAction func addItem(_ sender: UIButton) {
-        // Input
+    
+    func addNewItem() {
         //let item = Personal(context: moc)
         var header: String = ""
         if (input.text != "") { // Nothing happens when field is empty
@@ -121,72 +201,6 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         } else {
             // Nothing
         }
-        
-    }
-    
-    // MARK: - Life cycle
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        moc = appDelegate.persistentContainer.viewContext
-        
-        setupLayout()
-        allowSpeech()
-        
-        self.updateView()
-    }
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
-        input.becomeFirstResponder()
-
-        performTheFetch()
-        tableView.reloadData()
-    }
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(true)
-    }
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(true)
-    }
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        updateView()
-        
-        if input.text == "" {
-            addHeader.isEnabled = false
-            addItem.isEnabled = false
-        }
-    }
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    // MARK: - Functions
-    func setupLayout() {
-        self.tableView.separatorStyle = UITableViewCellSeparatorStyle.none
-        pageTitle.title = items?.listname
-        input.layer.cornerRadius = 10
-        addHeader.titleLabel?.text = "+H"
-        input.addTarget(self, action: #selector(textFielddidChange(_:)), for: .editingChanged)
-        input.layer.borderColor = UIColor.Palette.brownVar4.cgColor
-        inputview.layer.backgroundColor = UIColor.Palette.brownVar3.cgColor
-        input.layer.borderWidth = 2
-        createGradient()
-        
-        if items?.personal?.value(forKey: "reminderDate") != nil {
-            originalDateTime = items?.personal?.value(forKey: "reminderDate") as? Date
-        } else {
-            if items?.personal?.value(forKey: "duedate") == nil {
-                originalDateTime = Date()
-            } else {
-                originalDateTime = items?.personal?.value(forKey: "duedate") as? Date
-            }
-        }
-        duedateSet = items?.personal?.value(forKey: "duedateSet") as? Bool
-        setupViewReminderDatePicker()
-        setupChangeHeaderField()
-        self.pickerViewReminder.addTarget(self, action: #selector(reminderPickerChanged), for: .valueChanged)
     }
     
     func plannedChanged(index: IndexPath, bool: Bool) {
@@ -721,21 +735,11 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     
     // MARK: - updateView
     func updateView() {
-        var hasItems = false
-        if let items = items?.personal {
-            hasItems = items.count > 0
-        }
-        tableView.isHidden = !hasItems
         
-        //activityIndicatorView.stopAnimating()
     }
-    func filterForList() {
-        let subpred1:NSPredicate
-        if items?.listname == nil {
-            subpred1 = NSPredicate(format: "lists.listname == %@", "Winkellijst")
-        } else {
-            subpred1 = NSPredicate(format: "lists.listname != %@", (items?.listname)!)
-        }
+    func filterForList(listname:String) {
+        print("filter to fill table")
+        let subpred1 = NSPredicate(format: "lists.listname != %@", listname)
         let subpred2 = NSPredicate(format: "lists.plist == true")
         let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpred1, subpred2])
         coreDelegate.fetchedResultsControllerPersonal.fetchRequest.predicate = predicate
@@ -749,13 +753,17 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     
     // MARK: - Table view data source
     func numberOfSections(in tableView: UITableView) -> Int {
-        filterForList()
+        if items != nil {
+            filterForList(listname:listName!)
         
-        guard let sections = coreDelegate.fetchedResultsControllerPersonal.sections else {
-            print("no sections found")
-            return 0
+            guard let sections = coreDelegate.fetchedResultsControllerPersonal.sections else {
+                print("no sections found")
+                return 0
+            }
+            print("found sections: \((sections.count))")
+            return sections.count
         }
-        return sections.count
+        return 0
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -763,7 +771,9 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
         guard let headerCell = tableView.dequeueReusableCell(withIdentifier: "UserHeader") as? UserHeaderTableViewCell else {
             fatalError("found nil")
         }
-        filterForList()
+        if items != nil {
+            filterForList(listname:listName!)
+        }
         // Get unique headers from core data!
         guard let sectionInfo = coreDelegate.fetchedResultsControllerPersonal.sections?[section] else {
             fatalError("Unexpected section")
@@ -790,15 +800,21 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // Get unique headers from core data
-        filterForList()
+        if items != nil {
+            filterForList(listname:listName!)
         
-        let count = coreDelegate.fetchedResultsControllerPersonal.sections?[section].numberOfObjects
-        let header = coreDelegate.getHeaderArray("Personal", listname: (items?.listname)!).sorted()[section]
-        if itemIsEmpty(header: header) {
-            return count! - 1
-        }
-        return count!
+            let count = coreDelegate.fetchedResultsControllerPersonal.sections?[section].numberOfObjects
             
+            if items?.personal?.count != 0 {
+                
+               let header = coreDelegate.getHeaderArray("Personal", listname: (items?.listname)!).sorted()[section]
+                if itemIsEmpty(header: header) {
+                    return count! - 1
+                }
+            }
+            return count!
+        }
+        return 0
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {        
     }
@@ -880,7 +896,7 @@ class PersonalListsViewController: UIViewController, UITableViewDataSource, UITa
     }
 }
 
-extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetchedResultsControllerDelegate {
+extension ItemListViewController: UserHeaderTableViewCellDelegate, NSFetchedResultsControllerDelegate {
     // MARK: - Controllers
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
         print("did change section")
@@ -934,11 +950,13 @@ extension PersonalListsViewController: UserHeaderTableViewCellDelegate, NSFetche
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         switch segue.identifier! {
         case "segueToDetail":
-            let destination = segue.destination as! PersonalDetailViewController
+            let destination = segue.destination as! DetailViewController
             let indexPath = tableView.indexPathForSelectedRow!
             let selectedObject = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
             destination.item = selectedObject
-            filterForList()
+            if items != nil {
+                filterForList(listname:listName!)
+            }
             let headers = coreDelegate.getHeaderArray("Personal", listname: (items?.listname)!)
             destination.headerlist = headers
             detailIndexPath = indexPath
@@ -1010,7 +1028,7 @@ extension UIColor {
 
 
 // MARK: - UISplitViewControllerDelegate
-extension PersonalListsViewController: UISplitViewControllerDelegate {
+extension ItemListViewController: UISplitViewControllerDelegate {
     
     func splitViewController(_ svc: UISplitViewController, willChangeTo displayMode: UISplitViewControllerDisplayMode) {
         switch displayMode {
@@ -1034,5 +1052,5 @@ extension PersonalListsViewController: UISplitViewControllerDelegate {
 }
 
 // MARK: - UINavigationControllerDelegate
-extension PersonalListsViewController: UINavigationControllerDelegate {
+extension ItemListViewController: UINavigationControllerDelegate {
 }

@@ -21,7 +21,7 @@ class UserHeaderTableViewCell: UITableViewCell {
     @IBOutlet weak var invisibleButton: UIButton!
     @IBOutlet weak var userHeaderView: UIView!
     static let reuseIdentifier = "UserHeader"
-    var delegateCell: PersonalListsViewController?
+    var delegateCell: ItemListViewController?
     var indexPath: IndexPath?
     
     @IBOutlet weak var editButton: UIButton!
