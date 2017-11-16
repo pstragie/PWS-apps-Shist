@@ -1,8 +1,8 @@
 //
-//  SharedListOverviewViewController.swift
+//  PersonalListViewController.swift
 //  SharedList
 //
-//  Created by Pieter Stragier on 30/10/2017.
+//  Created by Pieter Stragier on 07/11/2017.
 //  Copyright © 2017 PWS. All rights reserved.
 //
 
@@ -10,17 +10,20 @@ import UIKit
 import CoreData
 import CoreLocation
 
-class SharedListOverviewViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+final class PersonalListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let coreDelegate = CoreDataManager(modelName: "dataModel")
     let localdata = UserDefaults.standard
     var listItemIndexPath: IndexPath?
-    var sharedItemsViewController: ItemListViewController?
+    var personalItemsViewController: ItemListViewController? = nil
     var locationManager: CLLocationManager!
-    var clearsSelectionOnViewWillAppear: Bool = true
+    // MARK: - IBOutlets
     @IBOutlet weak var editButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var newListTextField: UITextField!
+    
+    // MARK: - IBActions
     @IBAction func editButton(_ sender: UIButton) {
         if tableView.isEditing == true {
             tableView.isEditing = false
@@ -29,19 +32,17 @@ class SharedListOverviewViewController: UIViewController, UITableViewDataSource,
         }
     }
     @IBAction func addNewList(_ sender: UIButton) {
-        coreDelegate.addNewList("Lists", input: newListTextField.text!, storage: "shared")
+        coreDelegate.addNewList("Lists", input: newListTextField.text!, storage: "personal")
         performFetch()
         tableView.reloadData()
     }
-    @IBOutlet weak var newListTextField: UITextField!
-    
-    override func viewDidLoad() {
+        override func viewDidLoad() {
         super.viewDidLoad()
         let startIndexPath:IndexPath = IndexPath(row: 0, section: 0)
         tableView.selectRow(at: startIndexPath, animated: true, scrollPosition: .none)
         if let split = self.splitViewController {
             let controllers = split.viewControllers
-            self.sharedItemsViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? ItemListViewController
+            self.personalItemsViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? ItemListViewController
         }
         
         setupLayout()
@@ -111,18 +112,18 @@ class SharedListOverviewViewController: UIViewController, UITableViewDataSource,
         cell.listContentView.layer.cornerRadius = 10
         cell.listContentView.layer.backgroundColor = UIColor.Palette.blueVar1.cgColor
         return cell
-    }
+     }
     
     
-    // Override to support conditional editing of the table view.
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
+     // Override to support conditional editing of the table view.
+     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+     // Return false if you do not want the specified item to be editable.
+     return true
+     }
     
     
-    // Override to support editing the table view.
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+     // Override to support editing the table view.
+     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath) as! ListCellModel
         let listname = cell.listName.text
         print("listname: \(listname!)")
@@ -135,7 +136,7 @@ class SharedListOverviewViewController: UIViewController, UITableViewDataSource,
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
-    }
+     }
     
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
         return .none
@@ -145,40 +146,43 @@ class SharedListOverviewViewController: UIViewController, UITableViewDataSource,
         return false
     }
     
-    // Override to support rearranging the table view.
-    func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+     // Override to support rearranging the table view.
+     func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
         var lists = coreDelegate.fetchedResultsControllerLists.fetchedObjects
         
         let rowToMove = lists?[fromIndexPath.row]
         lists!.remove(at: fromIndexPath.row)
         lists!.insert(rowToMove!, at: to.row)
-    }
+     }
     
     
     
-    // Override to support conditional rearranging of the table view.
-    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
+     // Override to support conditional rearranging of the table view.
+     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+     // Return false if you do not want the item to be re-orderable.
+     return true
+     }
     
     
-    // MARK: - Navigation
+     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
         switch segue.identifier! {
-        case "segueSharedToItems":
+        case "seguePersonalToItems":
+            
             if let indexPath = tableView.indexPathForSelectedRow {
+                print("selected indexPath = \(indexPath)")
                 let object = coreDelegate.fetchedResultsControllerLists.object(at: indexPath)
                 let controller = (segue.destination as! UINavigationController).topViewController as! ItemListViewController
                 controller.items = object
                 controller.listName = object.listname
-
                 controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
+            
         default:
+            print("other segue")
             break
         }
         
@@ -186,4 +190,5 @@ class SharedListOverviewViewController: UIViewController, UITableViewDataSource,
     @IBAction func backUnwindAction(unwindSegue: UIStoryboardSegue) {
         dismiss(animated: true, completion: nil)
     }
+
 }

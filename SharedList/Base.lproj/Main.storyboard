@@ -117,7 +117,7 @@
         <!--Personal Master-->
         <scene sceneID="9TM-ib-Ke4">
             <objects>
-                <viewController title="Personal Master" id="tI2-jx-gI7" customClass="PersonalListOverviewViewController" customModule="SharedList" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Personal Master" id="tI2-jx-gI7" customClass="PersonalListViewController" customModule="SharedList" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="OXw-rJ-6mC"/>
                         <viewControllerLayoutGuide type="bottom" id="wsX-hW-hjd"/>
@@ -875,7 +875,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IzX-Zo-Lm6">
-                                <rect key="frame" x="107" y="597" width="200" height="40"/>
+                                <rect key="frame" x="107" y="646" width="200" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" priority="999" constant="200" id="8Tq-14-RBr"/>
                                     <constraint firstAttribute="height" priority="999" constant="40" id="T4O-D9-MmS"/>
@@ -886,7 +886,7 @@
                                 </connections>
                             </button>
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="gI1-i0-AoF" userLabel="button Stack">
-                                <rect key="frame" x="30" y="657" width="354" height="30"/>
+                                <rect key="frame" x="30" y="706" width="354" height="30"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J76-1s-VEA">
                                         <rect key="frame" x="0.0" y="0.0" width="177" height="30"/>
@@ -910,10 +910,10 @@
                                 </constraints>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Sn9-ku-GXt" userLabel="image Stack">
-                                <rect key="frame" x="10" y="154" width="394" height="423"/>
+                                <rect key="frame" x="10" y="154" width="394" height="472"/>
                                 <subviews>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="IaC-Zy-wA4">
-                                        <rect key="frame" x="20" y="0.0" width="355" height="423"/>
+                                        <rect key="frame" x="20" y="0.0" width="355" height="472"/>
                                     </imageView>
                                 </subviews>
                             </stackView>
@@ -1053,7 +1053,7 @@
         <!--Shared Master-->
         <scene sceneID="NIZ-hq-RHU">
             <objects>
-                <viewController title="Shared Master" id="nxk-7p-m1F" customClass="SharedListOverviewViewController" customModule="SharedList" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Shared Master" id="nxk-7p-m1F" customClass="SharedListViewController" customModule="SharedList" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="TGH-xc-wtS"/>
                         <viewControllerLayoutGuide type="bottom" id="TRQ-g3-sW6"/>
