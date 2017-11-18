@@ -22,6 +22,7 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
     @IBOutlet weak var editButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var newListTextField: UITextField!
+    @IBOutlet weak var addNewListButton: UIButton!
     
     // MARK: - IBActions
     @IBAction func editButton(_ sender: UIButton) {
@@ -36,7 +37,8 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
         performFetch()
         tableView.reloadData()
     }
-        override func viewDidLoad() {
+    
+    override func viewDidLoad() {
         super.viewDidLoad()
         let startIndexPath:IndexPath = IndexPath(row: 0, section: 0)
         tableView.selectRow(at: startIndexPath, animated: true, scrollPosition: .none)
@@ -48,10 +50,11 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
         setupLayout()
     }
     override func viewWillAppear(_ animated: Bool) {
+        performFetch()
         if self.splitViewController!.isCollapsed {
             self.tableView.deselectRow(at: tableView.indexPathForSelectedRow!, animated: true)
         }
-        performFetch()
+        
         super.viewWillAppear(true)
     }
     override func viewWillDisappear(_ animated: Bool) {
@@ -71,7 +74,7 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
     // MARK: - Functions
     func performFetch() {
         do {
-            try coreDelegate.fetchedResultsControllerLists.performFetch()
+            try coreDelegate.fetchedResultsControllerListsPersonal.performFetch()
         } catch {
             let fetchError = error as NSError
             fatalError("Could not fetch records: \(fetchError)")
@@ -81,15 +84,24 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
     func setupLayout() {
         self.tableView.separatorStyle = UITableViewCellSeparatorStyle.none
         tableView.isEditing = false
+        newListTextField.addTarget(self, action: #selector(newListTextFieldChangeDetected), for: .allEditingEvents)
+        addNewListButton.isEnabled = false
     }
     
+    func newListTextFieldChangeDetected(_ textField: UITextField) {
+        if newListTextField.text == "" {
+            addNewListButton.isEnabled = false
+        } else {
+            addNewListButton.isEnabled = true
+        }
+    }
     func insertData() {
         performFetch()
     }
     // MARK: - Table view data source
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let lists = coreDelegate.fetchedResultsControllerLists.fetchedObjects else { return 0 }
+        guard let lists = coreDelegate.fetchedResultsControllerListsPersonal.fetchedObjects else { return 0 }
         return lists.count
     }
     
@@ -105,7 +117,7 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ListCellModel.reuseIdentifier, for: indexPath) as? ListCellModel else {
             fatalError("Unexpected Index Path")
         }
-        let list = coreDelegate.fetchedResultsControllerLists.object(at: indexPath)
+        let list = coreDelegate.fetchedResultsControllerListsPersonal.object(at: indexPath)
         // Configure the cell...
         cell.listName.text = list.listname
         cell.listContentView.layer.borderWidth = 1
@@ -117,8 +129,8 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
     
      // Override to support conditional editing of the table view.
      func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-     // Return false if you do not want the specified item to be editable.
-     return true
+        // Return false if you do not want the specified item to be editable.
+        return true
      }
     
     
@@ -126,7 +138,6 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
      func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath) as! ListCellModel
         let listname = cell.listName.text
-        print("listname: \(listname!)")
         if editingStyle == .delete {
             // Delete the list from the core data
             coreDelegate.removeList(entitynaam: "Lists", listname: listname!,  fromList: "plist")
@@ -148,7 +159,7 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
     
      // Override to support rearranging the table view.
      func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        var lists = coreDelegate.fetchedResultsControllerLists.fetchedObjects
+        var lists = coreDelegate.fetchedResultsControllerListsPersonal.fetchedObjects
         
         let rowToMove = lists?[fromIndexPath.row]
         lists!.remove(at: fromIndexPath.row)
@@ -159,8 +170,8 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
     
      // Override to support conditional rearranging of the table view.
      func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-     // Return false if you do not want the item to be re-orderable.
-     return true
+        // Return false if you do not want the item to be re-orderable.
+        return true
      }
     
     
@@ -170,19 +181,17 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
         // Pass the selected object to the new view controller.
         switch segue.identifier! {
         case "seguePersonalToItems":
-            
             if let indexPath = tableView.indexPathForSelectedRow {
-                print("selected indexPath = \(indexPath)")
-                let object = coreDelegate.fetchedResultsControllerLists.object(at: indexPath)
+                let object = coreDelegate.fetchedResultsControllerListsPersonal.object(at: indexPath)
                 let controller = (segue.destination as! UINavigationController).topViewController as! ItemListViewController
                 controller.items = object
                 controller.listName = object.listname
+                controller.entity = "personal"
                 controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
             
         default:
-            print("other segue")
             break
         }
         
@@ -190,5 +199,4 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
     @IBAction func backUnwindAction(unwindSegue: UIStoryboardSegue) {
         dismiss(animated: true, completion: nil)
     }
-
 }

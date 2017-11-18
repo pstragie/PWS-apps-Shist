@@ -20,6 +20,7 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     var listName: String?
+    var entity: String?
     //let itemListViewController = ItemListViewController()
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let coreDelegate = CoreDataManager(modelName: "dataModel")
@@ -58,26 +59,28 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var addHeader: UIButton!
     @IBOutlet weak var addItem: UIButton!
 
+    @IBOutlet weak var emptyTableMessage: UILabel!
     @IBOutlet weak var tableItemView: UIView!
-    @IBOutlet weak var userHeaderView: UIView!
-            
+    
     // MARK: - IBActions
     
     
 
     @IBAction func addHeader(_ sender: UIButton) {
         // Input
-        //let item = Personal(context: moc)
         addNewHeader()
+        tableView.reloadData()
     }
     @IBAction func addItem(_ sender: UIButton) {
         // Input
         addNewItem()
+        tableView.reloadData()
     }
     
     // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("view did load")
         configureView()
         // Do any additional setup after loading the view, typically from a nib.
         moc = appDelegate.persistentContainer.viewContext
@@ -89,8 +92,12 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        print("items: \(String(describing: items?.personal))")
-        listName = items?.listname!
+        print("View will appear")
+        if items != nil {
+            listName = items?.listname!
+        } else {
+            listName = "Select a list"
+        }
         tableView.reloadData()
         input.becomeFirstResponder()
     }
@@ -116,7 +123,34 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // MARK: - Functions
     func setupLayout() {
+        if items != nil {
+            listName = items?.listname!
+            filterForList(listname:listName!)
+            var sections = [NSFetchedResultsSectionInfo?]()
+            if entity == "personal" {
+                sections = coreDelegate.fetchedResultsControllerPersonal.sections!
+            } else if entity == "shared" {
+                sections = coreDelegate.fetchedResultsControllerShared.sections!
+            }
+            
+            if sections.count == 0 {
+                print("number of items = \(String(describing: items?.personal?.count))")
+                emptyTableMessage.text = "Add items to your list."
+                emptyTableMessage.isHidden = false
+            } else {
+                self.emptyTableMessage.isHidden = true
+            }
+            
+        } else {
+            listName = "No list selected"
+            self.pageTitle.title = "No list selected"
+            emptyTableMessage.text = "Select a list to view its items."
+            emptyTableMessage.isHidden = false
+        }
+    
+
         self.tableView.separatorStyle = UITableViewCellSeparatorStyle.none
+        self.view.layer.backgroundColor = UIColor.Palette.beigeVar1.cgColor
         input.layer.cornerRadius = 10
         addHeader.titleLabel?.text = "+H"
         input.addTarget(self, action: #selector(textFielddidChange(_:)), for: .editingChanged)
@@ -151,11 +185,22 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func addNewHeader() {
         if (input.text != "") {
-            let personalItem = Personal(context: moc)
-            personalItem.setValue(input.text!, forKey: "header")
-            personalItem.setValue("", forKey: "item")
-            items?.addToPersonal(personalItem)
-            
+            if entity == "personal" {
+                let personal = Personal(context: moc)
+                personal.setValue(input.text!, forKey: "header")
+                personal.setValue("", forKey: "item")
+                
+                items?.addToPersonal(personal)
+                
+            } else if entity == "shared" {
+                let shared = Shared(context: moc)
+                shared.setValue(input.text!, forKey: "header")
+                shared.setValue("", forKey: "item")
+                
+                items?.addToShared(shared)
+            } else {
+                print("strange entity")
+            }
             headerSelected = false
             latestaddedHeader = input.text!
             coreDelegate.saveContext()
@@ -165,34 +210,64 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
         } else {
             // Nothing
         }
+        
     }
     
     func addNewItem() {
         //let item = Personal(context: moc)
         var header: String = ""
         if (input.text != "") { // Nothing happens when field is empty
-            let personalItem = Personal(context: moc)
-            personalItem.setValue(input.text!, forKey: "item")
-            personalItem.setValue(Date() as NSDate, forKey: "createdAt")
-            personalItem.setValue(false, forKey: "planned")
-            personalItem.setValue(false, forKey: "done")
             
-            if headerSelected == false {
-                print("header not selected")
-                if latestaddedHeader != "" { // Add item to last added header
-                    header = latestaddedHeader
-                } else { // No header added
-                    header = "Section 1"
+            if entity == "personal" {
+                let personalItem = Personal(context: moc)
+                personalItem.setValue(input.text!, forKey: "item")
+                personalItem.setValue(Date() as NSDate, forKey: "createdAt")
+                personalItem.setValue(false, forKey: "planned")
+                personalItem.setValue(false, forKey: "done")
+                
+                if headerSelected == false {
+                    print("header not selected")
+                    if latestaddedHeader != "" { // Add item to last added header
+                        header = latestaddedHeader
+                    } else { // No header added
+                        header = "Section 1"
+                    }
+                } else { // headerSelected == true
+                    header = selectedHeaderText!
                 }
-            } else { // headerSelected == true
-                header = selectedHeaderText!
-            }
-            personalItem.setValue(header, forKey: "header")
-            items?.addToPersonal(personalItem)
-            // Check if the section was empty (item == "") e.g. when a new section is added
-            if itemIsEmpty(header: header) == true {
-                // Remove the empty item
-                deleteWithPredicate(header: header, item: "")
+                personalItem.setValue(header, forKey: "header")
+
+                items?.addToPersonal(personalItem)
+                // Check if the section was empty (item == "") e.g. when a new section is added
+                if itemIsEmpty(header: header) == true {
+                    // Remove the empty item
+                    deleteWithPredicate(header: header, item: "")
+                }
+            } else if entity == "shared" {
+                let sharedItem = Shared(context: moc)
+                sharedItem.setValue(input.text!, forKey: "item")
+                sharedItem.setValue(Date() as NSDate, forKey: "createdAt")
+                sharedItem.setValue(false, forKey: "planned")
+                sharedItem.setValue(false, forKey: "done")
+                
+                if headerSelected == false {
+                    print("header not selected")
+                    if latestaddedHeader != "" { // Add item to last added header
+                        header = latestaddedHeader
+                    } else { // No header added
+                        header = "Section 1"
+                    }
+                } else { // headerSelected == true
+                    header = selectedHeaderText!
+                }
+                sharedItem.setValue(header, forKey: "header")
+                
+                items?.addToShared(sharedItem)
+                // Check if the section was empty (item == "") e.g. when a new section is added
+                if itemIsEmpty(header: header) == true {
+                    // Remove the empty item
+                    deleteWithPredicate(header: header, item: "")
+                }
             }
             input.text = ""
             coreDelegate.saveContext()
@@ -204,27 +279,44 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func plannedChanged(index: IndexPath, bool: Bool) {
-        let personalItem = coreDelegate.fetchedResultsControllerPersonal.object(at: index)
-        //let personalItem = Personal(context: moc)
-        personalItem.setValue(bool, forKey: "planned")
+        if entity == "personal" {
+            let personalItem = coreDelegate.fetchedResultsControllerPersonal.object(at: index)
+            personalItem.setValue(bool, forKey: "planned")
+        } else if entity == "shared" {
+            let sharedItem = coreDelegate.fetchedResultsControllerShared.object(at: index)
+            sharedItem.setValue(bool, forKey: "planned")
+        }
         coreDelegate.saveContext()
     }
     
     func doneChanged(index: IndexPath, bool: Bool) {
-        let personalItem = coreDelegate.fetchedResultsControllerPersonal.object(at: index)
-        //let personalItem = Personal(context: moc)
-        personalItem.setValue(bool, forKey: "done")
+        if entity == "personal" {
+            let personalItem = coreDelegate.fetchedResultsControllerPersonal.object(at: index)
+            personalItem.setValue(bool, forKey: "done")
+        } else if entity == "shared" {
+            let sharedItem = coreDelegate.fetchedResultsControllerShared.object(at: index)
+            sharedItem.setValue(bool, forKey: "done")
+        }
         coreDelegate.saveContext()
     }
     
     // MARK: Reminder
     func didTapBellButton(index: IndexPath) {
-        // Show datePicker with buttons: remove, save, cancel
-        let personalItem = coreDelegate.fetchedResultsControllerPersonal.object(at: index)
-        selectedBellIndex = index
-        originalDateTime = personalItem.reminderDate! as Date?
-        self.pickerViewReminder.setDate(originalDateTime!, animated: true)
-        viewPickerViewReminder.isHidden = false
+        if entity == "personal" {
+            // Show datePicker with buttons: remove, save, cancel
+            let personalItem = coreDelegate.fetchedResultsControllerPersonal.object(at: index)
+            selectedBellIndex = index
+            originalDateTime = personalItem.reminderDate! as Date?
+            self.pickerViewReminder.setDate(originalDateTime!, animated: true)
+            viewPickerViewReminder.isHidden = false
+        } else if entity == "shared" {
+            // Show datePicker with buttons: remove, save, cancel
+            let sharedItem = coreDelegate.fetchedResultsControllerShared.object(at: index)
+            selectedBellIndex = index
+            originalDateTime = sharedItem.reminderDate! as Date?
+            self.pickerViewReminder.setDate(originalDateTime!, animated: true)
+            viewPickerViewReminder.isHidden = false
+        }
     }
     
     // MARK: Reminder date Picker
@@ -307,8 +399,6 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     func reminderDoneTapped() {
         self.viewPickerViewReminder.isHidden = true
-        let personalitem = coreDelegate.fetchedResultsControllerPersonal.object(at: selectedBellIndex!)
-
         if chosenDateTime != nil {
             newReminderDate = chosenDateTime!
             if newReminderDate != nil {
@@ -321,13 +411,27 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
                 newReminderDate = storedReminderDate!
             }
         }
-        if newReminderDate != nil {
-        personalitem.setValue(newReminderDate!, forKey: "reminderDate")
-        } else {
-            if storedReminderDate != nil {
-                items?.personal?.setValue(storedReminderDate!, forKey: "reminderDate")
+        if entity == "personal" {
+            let personalitem = coreDelegate.fetchedResultsControllerPersonal.object(at: selectedBellIndex!)
+            if newReminderDate != nil {
+                personalitem.setValue(newReminderDate!, forKey: "reminderDate")
             } else {
-                items?.personal?.setValue(originalDateTime!, forKey: "reminderDate")
+                if storedReminderDate != nil {
+                    items?.personal?.setValue(storedReminderDate!, forKey: "reminderDate")
+                } else {
+                    items?.personal?.setValue(originalDateTime!, forKey: "reminderDate")
+                }
+            }
+        } else if entity == "shared" {
+            let sharedItem = coreDelegate.fetchedResultsControllerShared.object(at: selectedBellIndex!)
+            if newReminderDate != nil {
+                sharedItem.setValue(newReminderDate!, forKey: "reminderDate")
+            } else {
+                if storedReminderDate != nil {
+                    items?.shared?.setValue(storedReminderDate!, forKey: "reminderDate")
+                } else {
+                    items?.shared?.setValue(originalDateTime!, forKey: "reminderDate")
+                }
             }
         }
         coreDelegate.saveContext()
@@ -352,8 +456,13 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func reminderRemoveTapped() {
         self.viewPickerViewReminder.isHidden = true
-        let personalitem = coreDelegate.fetchedResultsControllerPersonal.object(at: selectedBellIndex!)
-        personalitem.setValue(false, forKey: "reminderSet")
+        if entity == "personal" {
+            let personalitem = coreDelegate.fetchedResultsControllerPersonal.object(at: selectedBellIndex!)
+            personalitem.setValue(false, forKey: "reminderSet")
+        } else if entity == "shared" {
+            let sharedItem = coreDelegate.fetchedResultsControllerShared.object(at: selectedBellIndex!)
+            sharedItem.setValue(false, forKey: "reminderSet")
+        }
         coreDelegate.saveContext()
         tableView.reloadData()
     }
@@ -479,7 +588,7 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
         print("Bin tapped")
         // Delete selected header (and items)
         let sectionTitle = sender.textLabel?.text
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: (entity?.capitalized)!)
         let predicate = NSPredicate(format: "header == %@", sectionTitle!)
         fetchRequest.predicate = predicate
         let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
@@ -488,9 +597,7 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
         } catch {
             print("Batch delete did not work.")
         }
-        
         performTheFetch()
-        
         tableView.reloadData()
     }
     
@@ -499,26 +606,35 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
         sectionTitle = sender.textLabel?.text
         input.resignFirstResponder()
         self.changeHeaderView.isHidden = false
-        
     }
 
     // MARK: Bin action
     func didTapBinItem(index: IndexPath) {
         print("Bin tapped at: \(index)")
         // Delete selected item from Entity
-        let personalitem = coreDelegate.fetchedResultsControllerPersonal.object(at: index as IndexPath)
-        let header = personalitem.header!
-        let item = personalitem.item!
-        deleteWithPredicate(header: header, item: item)
+        let header:String?
+        if entity == "personal" {
+            let personalitem = coreDelegate.fetchedResultsControllerPersonal.object(at: index as IndexPath)
+            header = personalitem.header!
+            let item = personalitem.item!
+            deleteWithPredicate(header: header!, item: item)
+        } else if entity == "shared" {
+            let sharedItem = coreDelegate.fetchedResultsControllerShared.object(at: index as IndexPath)
+            header = sharedItem.header!
+            let item = sharedItem.item!
+            deleteWithPredicate(header: header!, item: item)
+        } else {
+            header = ""
+        }
  
         //items?.removeFromPersonal(item)
         //coreDelegate.saveContext()
-        latestaddedHeader = header
+        latestaddedHeader = header!
         performTheFetch()
         // If last item in section is removed, add empty section
         var result: Array<Any> = []
-        let fetchRequest2 = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
-        let predicate2 = NSPredicate(format: "header == %@", header)
+        let fetchRequest2 = NSFetchRequest<NSFetchRequestResult>(entityName: (entity?.capitalized)!)
+        let predicate2 = NSPredicate(format: "header == %@", header!)
         fetchRequest2.predicate = predicate2
         do {
             result = try moc.fetch(fetchRequest2)
@@ -527,14 +643,17 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         if result.count == 0 {
             print("result = 0")
-            let personalitem = Personal(context: moc)
-            // Add empty section
-            personalitem.header = header
-            //item.datum = Date() as NSDate
-            //item.planned = false
-            //item.done = false
-            personalitem.item = ""
-            items?.addToPersonal(personalitem)
+            if entity == "personal" {
+                let personalitem = Personal(context: moc)
+                personalitem.header = header
+                personalitem.item = ""
+                items?.addToPersonal(personalitem)
+            } else if entity == "shared" {
+                let sharedItem = Shared(context: moc)
+                sharedItem.header = header
+                sharedItem.item = ""
+                items?.addToShared(sharedItem)
+            }
             headerSelected = false
             do { try moc.save() } catch { print("not saved") }
             coreDelegate.saveContext()
@@ -551,27 +670,53 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
         let subpred1 = NSPredicate(format: "header == %@", header)
         let subpred2 = NSPredicate(format: "item == %@", item)
         let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpred1, subpred2])
-        coreDelegate.fetchedResultsControllerPersonal.fetchRequest.predicate = predicate
-        let fetchRequest = coreDelegate.fetchedResultsControllerPersonal.fetchRequest
-        if let result = try? moc.fetch(fetchRequest) {
-            for object in result {
-                moc.delete(object)
+        if entity == "personal" {
+            coreDelegate.fetchedResultsControllerPersonal.fetchRequest.predicate = predicate
+            let fetchRequest = coreDelegate.fetchedResultsControllerPersonal.fetchRequest
+            if let result = try? moc.fetch(fetchRequest) {
+                for object in result {
+                    moc.delete(object)
+                }
+            }
+        } else if entity == "shared" {
+            coreDelegate.fetchedResultsControllerShared.fetchRequest.predicate = predicate
+            let fetchRequest = coreDelegate.fetchedResultsControllerShared.fetchRequest
+            if let result = try? moc.fetch(fetchRequest) {
+                for object in result {
+                    moc.delete(object)
+                }
             }
         }
     }
+    
     func performTheFetch() {
-        do {
-            try coreDelegate.fetchedResultsControllerPersonal.performFetch()
-        } catch {
-            let fetchError = error as NSError
-            fatalError("Could not fetch records: \(fetchError)")
+        if entity == "personal" {
+            do {
+                try coreDelegate.fetchedResultsControllerPersonal.performFetch()
+            } catch {
+                let fetchError = error as NSError
+                fatalError("Could not fetch records: \(fetchError)")
+            }
+        } else if entity == "shared" {
+            do {
+                try coreDelegate.fetchedResultsControllerShared.performFetch()
+            } catch {
+                let fetchError = error as NSError
+                fatalError("Could not fetch records: \(fetchError)")
+            }
         }
     }
+    
     func configure(_ cell: CellModel, at indexPath: IndexPath) {
         // Fetch item
-        let item = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
-        // Configure cell
-        cell.listitem.text = item.item
+        if entity == "personal" {
+            let item = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
+            // Configure cell
+            cell.listitem.text = item.item
+        } else if entity == "shared" {
+            let item = coreDelegate.fetchedResultsControllerShared.object(at: indexPath)
+            cell.listitem.text = item.item
+        }
     }
     func textFielddidChange(_ textField: UITextField) {
         if input.text == "" {
@@ -592,7 +737,7 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
     func itemIsEmpty(header: String) -> Bool {
         var itemIsEmpty: Bool = false
         var result: Array<Any> = []
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: (entity?.capitalized)!)
         let subpredicate1 = NSPredicate(format: "item == %@", "")
         let subpredicate2 = NSPredicate(format: "header == %@", header)
         let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpredicate1, subpredicate2])
@@ -738,16 +883,28 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
         
     }
     func filterForList(listname:String) {
-        print("filter to fill table")
-        let subpred1 = NSPredicate(format: "lists.listname != %@", listname)
-        let subpred2 = NSPredicate(format: "lists.plist == true")
-        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpred1, subpred2])
-        coreDelegate.fetchedResultsControllerPersonal.fetchRequest.predicate = predicate
-        
-        do {
-            try coreDelegate.fetchedResultsControllerPersonal.performFetch()
-        } catch {
-            fatalError("Could not fetch")
+        var subpred2:NSPredicate?
+        let subpred1 = NSPredicate(format: "lists.listname == %@", listname)
+        if entity == "personal" {
+            subpred2 = NSPredicate(format: "lists.plist == true")
+        } else if entity == "shared" {
+            subpred2 = NSPredicate(format: "lists.slist == true")
+        }
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpred1, subpred2!])
+        if entity == "personal" {
+            coreDelegate.fetchedResultsControllerPersonal.fetchRequest.predicate = predicate
+            do {
+                try coreDelegate.fetchedResultsControllerPersonal.performFetch()
+            } catch {
+                fatalError("Could not fetch")
+            }
+        } else if entity == "shared" {
+            coreDelegate.fetchedResultsControllerShared.fetchRequest.predicate = predicate
+            do {
+                try coreDelegate.fetchedResultsControllerShared.performFetch()
+            } catch {
+                fatalError("Could not fetch")
+            }
         }
     }
     
@@ -755,42 +912,60 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
     func numberOfSections(in tableView: UITableView) -> Int {
         if items != nil {
             filterForList(listname:listName!)
-        
-            guard let sections = coreDelegate.fetchedResultsControllerPersonal.sections else {
+            if entity == "personal" {
+                guard let sections = coreDelegate.fetchedResultsControllerPersonal.sections else {
                 print("no sections found")
                 return 0
             }
-            print("found sections: \((sections.count))")
-            return sections.count
+                return sections.count
+            } else if entity == "shared" {
+                guard let sections = coreDelegate.fetchedResultsControllerShared.sections else {
+                print("no sections found")
+                return 0
+            }
+                return sections.count
+            }
+            //print("found sections: \((sections.count))")
+            
         }
         return 0
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        
         guard let headerCell = tableView.dequeueReusableCell(withIdentifier: "UserHeader") as? UserHeaderTableViewCell else {
             fatalError("found nil")
         }
         if items != nil {
             filterForList(listname:listName!)
+            if entity == "personal" {
+                // Get unique headers from core data!
+                guard let sectionInfo = coreDelegate.fetchedResultsControllerPersonal.sections?[section] else {
+                    fatalError("Unexpected section")
+                }
+                headerCell.textLabel?.text = sectionInfo.name
+            } else if entity == "shared" {
+                // Get unique headers from core data!
+                guard let sectionInfo = coreDelegate.fetchedResultsControllerShared.sections?[section] else {
+                    fatalError("Unexpected section")
+                }
+                headerCell.textLabel?.text = sectionInfo.name
+            }
+            
+            
+            headerCell.delegate = self
+            headerCell.layoutMargins.left = 30
+            
+            headerCell.textLabel?.textColor = UIColor.white
+            headerCell.delButton.tintColor = UIColor.white
+            headerCell.editButton.tintColor = UIColor.white
+            headerCell.layer.shadowColor = UIColor.black.cgColor
+            headerCell.layer.shadowRadius = 5
+            headerCell.layer.shadowOffset = CGSize.zero
+            headerCell.layer.shadowOpacity = 0.50
+            headerCell.layer.masksToBounds = false
+            headerCell.clipsToBounds = false
+            
         }
-        // Get unique headers from core data!
-        guard let sectionInfo = coreDelegate.fetchedResultsControllerPersonal.sections?[section] else {
-            fatalError("Unexpected section")
-        }
-        
-        headerCell.delegate = self
-        headerCell.layoutMargins.left = 30
-        headerCell.textLabel?.text = sectionInfo.name
-        headerCell.textLabel?.textColor = UIColor.white
-        headerCell.delButton.tintColor = UIColor.white
-        headerCell.editButton.tintColor = UIColor.white
-        headerCell.layer.shadowColor = UIColor.black.cgColor
-        headerCell.layer.shadowRadius = 5
-        headerCell.layer.shadowOffset = CGSize.zero
-        headerCell.layer.shadowOpacity = 0.50
-        headerCell.layer.masksToBounds = false
-        headerCell.clipsToBounds = false
         return headerCell
     }
     
@@ -802,47 +977,42 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
         // Get unique headers from core data
         if items != nil {
             filterForList(listname:listName!)
-        
-            let count = coreDelegate.fetchedResultsControllerPersonal.sections?[section].numberOfObjects
-            
-            if items?.personal?.count != 0 {
-                
-               let header = coreDelegate.getHeaderArray("Personal", listname: (items?.listname)!).sorted()[section]
-                if itemIsEmpty(header: header) {
-                    return count! - 1
+            var count:Int?
+            if entity == "personal" {
+                count = coreDelegate.fetchedResultsControllerPersonal.sections?[section].numberOfObjects
+                if items?.personal?.count != 0 {
+                    
+                    let header = coreDelegate.getHeaderArray("Personal", listname: (items?.listname)!).sorted()[section]
+                    if itemIsEmpty(header: header) {
+                        return count! - 1
+                    }
                 }
+                return count!
+            } else if entity == "shared" {
+                count = coreDelegate.fetchedResultsControllerShared.sections?[section].numberOfObjects
+                if items?.shared?.count != 0 {
+                    
+                    let header = coreDelegate.getHeaderArray("Shared", listname: (items?.listname)!).sorted()[section]
+                    if itemIsEmpty(header: header) {
+                        return count! - 1
+                    }
+                }
+                return count!
             }
-            return count!
+            
         }
         return 0
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {        
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CellModel.reuseIdentifier, for: indexPath) as? CellModel else {
             fatalError("Unexpected Index Path")
         }
-        // Check if due date is imminent
-        let item = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
         cell.cellView.layer.borderColor = UIColor.Palette.beigeVar1.cgColor
         cell.cellView.layer.borderWidth = 1
         cell.cellView.layer.cornerRadius = 5
-        if  item.duedateSet == true && item.done == false {
-            var dueInterval: Double = 0.0
-            let dueDate:NSDate = item.duedate!
-            dueInterval = dueDate.timeIntervalSinceNow
-            if dueInterval <= 86400 {
-                cell.cellView.layer.shadowColor = UIColor.purple.cgColor
-                cell.cellView.layer.shadowRadius = 6
-                cell.cellView.layer.shadowOffset = CGSize.zero
-                cell.cellView.layer.shadowOpacity = 0.99
-            } else {
-                //print("due date not imminent")
-            }
-        } else {
-            //print("due date not set")
-        }
+        
         cell.delegateCell = self
         cell.indexPath = indexPath
         // Configure Cell
@@ -852,46 +1022,124 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
         cell.layer.borderWidth = 0
         cell.showsReorderControl = true
         
-        // fetch items for correct header
-        //let item = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
-        let pl: Bool = item.planned
-        let d: Bool = item.done
-        if pl == false {
-            cell.planned.isEnabled = true
-            cell.planned.setImage(#imageLiteral(resourceName: "checkbox-empty"), for: .normal)
-        } else {
-            cell.planned.isEnabled = true
-            cell.planned.setImage(#imageLiteral(resourceName: "checkbox-filled"), for: .normal)
-        }
-        if d == false {
-            cell.planned.isEnabled = true
-            cell.done.setImage(#imageLiteral(resourceName: "checkbox-empty"), for: .normal)
-        } else {
-            cell.planned.isEnabled = false
-            cell.done.setImage(#imageLiteral(resourceName: "checkbox-filled"), for: .normal)
-        }
-        cell.listitem?.text = item.item
-        if item.iteminfo == "" {
-            cell.listinfo.isHidden = true
-        } else {
-            cell.listinfo.isHidden = false
-            cell.listinfo?.text = item.iteminfo
-        }
-        if item.reminderSet == true {
-            var reminderInterval: Double?
-            let remDate:NSDate = item.reminderDate!
-            reminderInterval = remDate.timeIntervalSinceNow
-            if reminderInterval! <= 0.0 {
-                cell.bellButton.setImage(#imageLiteral(resourceName: "bell ringing 40x40"), for: .normal)
-            } else {
-                cell.bellButton.setImage(#imageLiteral(resourceName: "bell 40x40"), for: .normal)
-            }
-            cell.bellButton.isHidden = false
+        if items != nil {
+            // Check if due date is imminent
             
-        } else {
-            cell.bellButton.isHidden = true
+            if entity == "personal" {
+                let item = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
+                if  item.duedateSet == true && item.done == false {
+                    var dueInterval: Double = 0.0
+                    let dueDate:NSDate = item.duedate!
+                    dueInterval = dueDate.timeIntervalSinceNow
+                    if dueInterval <= 86400 {
+                        cell.cellView.layer.shadowColor = UIColor.purple.cgColor
+                        cell.cellView.layer.shadowRadius = 6
+                        cell.cellView.layer.shadowOffset = CGSize.zero
+                        cell.cellView.layer.shadowOpacity = 0.99
+                    } else {
+                        //print("due date not imminent")
+                    }
+                } else {
+                    //print("due date not set")
+                }
+                let pl: Bool = item.planned
+                let d: Bool = item.done
+                if pl == false {
+                    cell.planned.isEnabled = true
+                    cell.planned.setImage(#imageLiteral(resourceName: "checkbox-empty"), for: .normal)
+                } else {
+                    cell.planned.isEnabled = true
+                    cell.planned.setImage(#imageLiteral(resourceName: "checkbox-filled"), for: .normal)
+                }
+                if d == false {
+                    cell.planned.isEnabled = true
+                    cell.done.setImage(#imageLiteral(resourceName: "checkbox-empty"), for: .normal)
+                } else {
+                    cell.planned.isEnabled = false
+                    cell.done.setImage(#imageLiteral(resourceName: "checkbox-filled"), for: .normal)
+                }
+                cell.listitem?.text = item.item
+                if item.iteminfo == "" {
+                    cell.listinfo.isHidden = true
+                } else {
+                    cell.listinfo.isHidden = false
+                    cell.listinfo?.text = item.iteminfo
+                }
+                if item.reminderSet == true {
+                    var reminderInterval: Double?
+                    let remDate:NSDate = item.reminderDate!
+                    reminderInterval = remDate.timeIntervalSinceNow
+                    if reminderInterval! <= 0.0 {
+                        cell.bellButton.setImage(#imageLiteral(resourceName: "bell ringing 40x40"), for: .normal)
+                    } else {
+                        cell.bellButton.setImage(#imageLiteral(resourceName: "bell 40x40"), for: .normal)
+                    }
+                    cell.bellButton.isHidden = false
+                    
+                } else {
+                    cell.bellButton.isHidden = true
+                }
+                
+                return cell
+
+            } else if entity == "shared" {
+                let item = coreDelegate.fetchedResultsControllerShared.object(at: indexPath)
+                if  item.duedateSet == true && item.done == false {
+                    var dueInterval: Double = 0.0
+                    let dueDate:NSDate = item.duedate!
+                    dueInterval = dueDate.timeIntervalSinceNow
+                    if dueInterval <= 86400 {
+                        cell.cellView.layer.shadowColor = UIColor.purple.cgColor
+                        cell.cellView.layer.shadowRadius = 6
+                        cell.cellView.layer.shadowOffset = CGSize.zero
+                        cell.cellView.layer.shadowOpacity = 0.99
+                    } else {
+                        //print("due date not imminent")
+                    }
+                } else {
+                    //print("due date not set")
+                }
+                let pl: Bool = item.planned
+                let d: Bool = item.done
+                if pl == false {
+                    cell.planned.isEnabled = true
+                    cell.planned.setImage(#imageLiteral(resourceName: "checkbox-empty"), for: .normal)
+                } else {
+                    cell.planned.isEnabled = true
+                    cell.planned.setImage(#imageLiteral(resourceName: "checkbox-filled"), for: .normal)
+                }
+                if d == false {
+                    cell.planned.isEnabled = true
+                    cell.done.setImage(#imageLiteral(resourceName: "checkbox-empty"), for: .normal)
+                } else {
+                    cell.planned.isEnabled = false
+                    cell.done.setImage(#imageLiteral(resourceName: "checkbox-filled"), for: .normal)
+                }
+                cell.listitem?.text = item.item
+                if item.iteminfo == "" {
+                    cell.listinfo.isHidden = true
+                } else {
+                    cell.listinfo.isHidden = false
+                    cell.listinfo?.text = item.iteminfo
+                }
+                if item.reminderSet == true {
+                    var reminderInterval: Double?
+                    let remDate:NSDate = item.reminderDate!
+                    reminderInterval = remDate.timeIntervalSinceNow
+                    if reminderInterval! <= 0.0 {
+                        cell.bellButton.setImage(#imageLiteral(resourceName: "bell ringing 40x40"), for: .normal)
+                    } else {
+                        cell.bellButton.setImage(#imageLiteral(resourceName: "bell 40x40"), for: .normal)
+                    }
+                    cell.bellButton.isHidden = false
+                    
+                } else {
+                    cell.bellButton.isHidden = true
+                }
+                
+                return cell
+            }
         }
-        
         return cell
     }
 }
@@ -949,17 +1197,25 @@ extension ItemListViewController: UserHeaderTableViewCellDelegate, NSFetchedResu
     // MARK: - Segue
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         switch segue.identifier! {
-        case "segueToDetail":
+        case "segueItemsToDetail":
             let destination = segue.destination as! DetailViewController
             let indexPath = tableView.indexPathForSelectedRow!
-            let selectedObject = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
-            destination.item = selectedObject
-            if items != nil {
-                filterForList(listname:listName!)
+            if entity == "personal" {
+                let selectedObject = coreDelegate.fetchedResultsControllerPersonal.object(at: indexPath)
+                destination.personalItem = selectedObject
+                destination.listname = selectedObject.lists?.listname!
+                destination.entity = entity
+            } else if entity == "shared" {
+                let selectedObject = coreDelegate.fetchedResultsControllerShared.object(at: indexPath)
+                destination.sharedItem = selectedObject
+                destination.listname = selectedObject.lists?.listname!
+                destination.entity = entity
+
             }
-            let headers = coreDelegate.getHeaderArray("Personal", listname: (items?.listname)!)
-            destination.headerlist = headers
-            detailIndexPath = indexPath
+            if items != nil {
+                detailIndexPath = indexPath
+            }
+            
         default:
             break
         }
@@ -1034,8 +1290,13 @@ extension ItemListViewController: UISplitViewControllerDelegate {
         switch displayMode {
         case .primaryHidden:
             let barButtonItem = svc.displayModeButtonItem
-            barButtonItem.title = NSLocalizedString("Personal", comment: "Personal")
-            navigationItem.setLeftBarButton(barButtonItem, animated: true)
+            if entity == "personal" {
+                barButtonItem.title = NSLocalizedString("Personal", comment: "Personal")
+                navigationItem.setLeftBarButton(barButtonItem, animated: true)
+            } else if entity == "shared" {
+                barButtonItem.title = NSLocalizedString("Shared", comment: "Shared")
+                navigationItem.setLeftBarButton(barButtonItem, animated: true)
+            }
         case.allVisible:
             navigationItem.setLeftBarButton(nil, animated: true)
         default:

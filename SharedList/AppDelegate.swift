@@ -53,7 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        //splitViewController(splitViewController: PersonalListOverviewViewController, collapseSecondaryViewController: ItemListViewController, ontoPrimaryViewController: PersonalListOverviewViewController)
+        print("NSHomeDir: \(NSHomeDirectory())")
         guard let tabBarController = window?.rootViewController as? UITabBarController,
             let splitViewController = tabBarController.viewControllers?.first as? UISplitViewController,
             let navigationController = splitViewController.viewControllers.last as? UINavigationController,
@@ -241,7 +241,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         pers.listname = "Winkellijst"
         shar.header = "Match"
         shar.item = "Wine"
-        shar.listname = "Winkellijst"
+        shar.listname = "Shopping List"
         list.addToPersonal(pers)
         list.addToShared(shar)
         do {
@@ -249,7 +249,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             fatalError("Could not save")
         }
-        
+        let list2 = Lists(context: moc)
+        let pers2 = Personal(context: moc)
+        list2.listname = "Bellen"
+        list2.plist = true
+        list2.slist = false
+        pers2.header = "Vandaag"
+        pers2.item = "Mama"
+        pers2.listname = "Bellen"
+        list2.addToPersonal(pers2)
+        do {
+            try moc.save()
+        } catch {
+            fatalError("Could not save")
+        }
     }
 }
 

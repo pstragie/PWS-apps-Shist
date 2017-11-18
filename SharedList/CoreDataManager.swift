@@ -26,11 +26,38 @@ final class CoreDataManager {
     
     
     // MARK: - fetchedResultsController
-    lazy var fetchedResultsControllerLists: NSFetchedResultsController<Lists> = {
+    func performFetchOnLists(entity:String) {
+        let lijst:String = (entity == "personal") ? "plist":"slist"
+        let moc = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Lists")
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "listname", ascending: true)]
+        fetchRequest.predicate = NSPredicate(format: "\(lijst) == true")
+        let controller = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: moc, sectionNameKeyPath: nil, cacheName: nil)
+        do {
+        try controller.performFetch()
+        } catch {
+        let fetchError = error as NSError
+        fatalError("Could not fetch records: \(fetchError)")
+        }
+    }
+    lazy var fetchedResultsControllerListsPersonal: NSFetchedResultsController<Lists> = {
         // Create Fetch Request
         let fetchRequest: NSFetchRequest<Lists> = Lists.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "listname", ascending: true)]
-        
+        fetchRequest.predicate = NSPredicate(format: "plist == true")
+        // Create Fetched Results Controller
+        let context = self.appDelegate.persistentContainer.viewContext
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
+        // Configure Fetched Results Controller
+        fetchedResultsController.delegate = self as? NSFetchedResultsControllerDelegate
+        return fetchedResultsController
+    }()
+    
+    lazy var fetchedResultsControllerListsShared: NSFetchedResultsController<Lists> = {
+        // Create Fetch Request
+        let fetchRequest: NSFetchRequest<Lists> = Lists.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "listname", ascending: true)]
+        fetchRequest.predicate = NSPredicate(format: "slist == true")
         // Create Fetched Results Controller
         let context = self.appDelegate.persistentContainer.viewContext
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
@@ -47,6 +74,20 @@ final class CoreDataManager {
         // Create Fetched Results Controller
         let context = self.appDelegate.persistentContainer.viewContext
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: #keyPath(Personal.header), cacheName: nil)
+        // Configure Fetched Results Controller
+        fetchedResultsController.delegate = self as? NSFetchedResultsControllerDelegate
+        
+        return fetchedResultsController
+    }()
+    
+    // MARK: - fetchedResultsController
+    lazy var fetchedResultsControllerShared: NSFetchedResultsController<Shared> = {
+        // Create Fetch Request
+        let fetchRequest: NSFetchRequest<Shared> = Shared.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "header", ascending: true)]
+        // Create Fetched Results Controller
+        let context = self.appDelegate.persistentContainer.viewContext
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: #keyPath(Shared.header), cacheName: nil)
         // Configure Fetched Results Controller
         fetchedResultsController.delegate = self as? NSFetchedResultsControllerDelegate
         
@@ -75,7 +116,7 @@ final class CoreDataManager {
     }
 
     // MARK: - createRecordForEntity
-    private func createRecordForEntity(_ entity: String, inManagedObjectContext managedObjectContext: NSManagedObjectContext) -> NSManagedObject? {
+    func createRecordForEntity(_ entity: String, inManagedObjectContext managedObjectContext: NSManagedObjectContext) -> NSManagedObject? {
         // Helpers
         var result: NSManagedObject?
         // Create Entity Description
@@ -93,8 +134,10 @@ final class CoreDataManager {
         list.listname = input
         if storage == "personal" {
             list.plist = true
+            list.slist = false
         } else {
             list.slist = true
+            list.plist = false
         }
         do {
             try moc.save()
@@ -241,6 +284,28 @@ final class CoreDataManager {
         return result
     }
     
+    func fetchList(listname: String, lijst: String, inManagedObjectContext managedObjectContext: NSManagedObjectContext) -> [NSManagedObject] {
+        // Create Fetch Request
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Lists")
+        let subpred1 = NSPredicate(format: "listname == %@", listname)
+        let subpred2 = NSPredicate(format: "\(lijst) == true")
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpred1, subpred2])
+        fetchRequest.predicate = predicate
+        // Helpers
+        var result = [NSManagedObject]()
+        
+        do {
+            // Execute Fetch Request
+            let records = try managedObjectContext.fetch(fetchRequest)
+            if let records = records as? [NSManagedObject] {
+                result = records
+            }
+        } catch {
+            print("Unable to fetch managed objects for entity Lists.")
+        }
+        return result
+    }
+    
     func getListArray(_ entitynaam: String) -> Array<String> {
         let moc = self.appDelegate.persistentContainer.viewContext
         var listArray: Array<String> = []
@@ -285,7 +350,6 @@ final class CoreDataManager {
             print("error fetching: \(error.localizedDescription)")
             return ["header 1"]
         }
-
         return headerArray
     }
     

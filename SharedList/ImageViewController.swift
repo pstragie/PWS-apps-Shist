@@ -15,6 +15,8 @@ class ImageViewController: UIViewController, UINavigationControllerDelegate, UII
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let coreDelegate = CoreDataManager(modelName: "dataModel")
     weak var objectPersonal: Personal?
+    weak var objectShared: Shared?
+    var entity: String?
     var imagePicker = UIImagePickerController()
     var newPic: Bool?
     var image:UIImage?
@@ -110,11 +112,20 @@ class ImageViewController: UIViewController, UINavigationControllerDelegate, UII
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        itemName.text = objectPersonal?.item!
-        let coupledImages:[UIImage?] = [objectPersonal?.images?.value(forKey: "image") as? UIImage]
-        let firstImage = coupledImages[0]
-        if firstImage != nil {
-            imageView.image = firstImage
+        if entity == "personal" {
+            itemName.text = objectPersonal?.item!
+            let coupledImages:[UIImage?] = [objectPersonal?.images?.value(forKey: "image") as? UIImage]
+            let firstImage = coupledImages[0]
+            if firstImage != nil {
+                imageView.image = firstImage
+            }
+        } else {
+            itemName.text = objectShared?.item!
+            let coupledImages:[UIImage?] = [objectShared?.images?.value(forKey: "image") as? UIImage]
+            let firstImage = coupledImages[0]
+            if firstImage != nil {
+                imageView.image = firstImage
+            }
         }
         // Do any additional setup after loading the view.
     }
@@ -166,17 +177,31 @@ extension ImageViewController {
         DispatchQueue.global(qos: .userInitiated).async {
             // create new objects in moc
             let moc = self.appDelegate.persistentContainer.viewContext
-            let Image = Pimages(context: moc)
-            Image.setValue(imageData, forKey: "image")
-            Image.setValue(imageURL, forKey: "url")
-            Image.setValue(thumbnailData, forKey: "thumbnail")
-            Image.setValue(info, forKey: "info")
-            do {
-                try moc.save()
-            } catch {
-                print("Could not save")
+            if self.entity == "personal" {
+                let Image = Pimages(context: moc)
+                Image.setValue(imageData, forKey: "image")
+                Image.setValue(imageURL, forKey: "url")
+                Image.setValue(thumbnailData, forKey: "thumbnail")
+                Image.setValue(info, forKey: "info")
+                do {
+                    try moc.save()
+                } catch {
+                    print("Could not save")
+                }
+                self.objectPersonal?.addToImages(Image)
+            } else {
+                let Image = Simages(context: moc)
+                Image.setValue(imageData, forKey: "image")
+                Image.setValue(imageURL, forKey: "url")
+                Image.setValue(thumbnailData, forKey: "thumbnail")
+                Image.setValue(info, forKey: "info")
+                do {
+                    try moc.save()
+                } catch {
+                    print("Could not save")
+                }
+                self.objectShared?.addToImages(Image)
             }
-            self.objectPersonal?.addToImages(Image)
             self.coreDelegate.saveContext()
         }
     }

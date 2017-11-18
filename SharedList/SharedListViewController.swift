@@ -16,11 +16,15 @@ class SharedListViewController: UIViewController, UITableViewDataSource, UITable
     let coreDelegate = CoreDataManager(modelName: "dataModel")
     let localdata = UserDefaults.standard
     var listItemIndexPath: IndexPath?
-    var sharedItemsViewController: ItemListViewController?
+    var sharedItemsViewController: ItemListViewController? = nil
     var locationManager: CLLocationManager!
-    var clearsSelectionOnViewWillAppear: Bool = true
+    // MARK: - IBOutlets
     @IBOutlet weak var editButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var newListTextField: UITextField!
+    @IBOutlet weak var addNewListButton: UIButton!
+    
+    // MARK: - IBActions
     @IBAction func editButton(_ sender: UIButton) {
         if tableView.isEditing == true {
             tableView.isEditing = false
@@ -33,7 +37,6 @@ class SharedListViewController: UIViewController, UITableViewDataSource, UITable
         performFetch()
         tableView.reloadData()
     }
-    @IBOutlet weak var newListTextField: UITextField!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,10 +50,11 @@ class SharedListViewController: UIViewController, UITableViewDataSource, UITable
         setupLayout()
     }
     override func viewWillAppear(_ animated: Bool) {
+        performFetch()
         if self.splitViewController!.isCollapsed {
             self.tableView.deselectRow(at: tableView.indexPathForSelectedRow!, animated: true)
         }
-        performFetch()
+        
         super.viewWillAppear(true)
     }
     override func viewWillDisappear(_ animated: Bool) {
@@ -70,7 +74,7 @@ class SharedListViewController: UIViewController, UITableViewDataSource, UITable
     // MARK: - Functions
     func performFetch() {
         do {
-            try coreDelegate.fetchedResultsControllerLists.performFetch()
+            try coreDelegate.fetchedResultsControllerListsShared.performFetch()
         } catch {
             let fetchError = error as NSError
             fatalError("Could not fetch records: \(fetchError)")
@@ -80,15 +84,25 @@ class SharedListViewController: UIViewController, UITableViewDataSource, UITable
     func setupLayout() {
         self.tableView.separatorStyle = UITableViewCellSeparatorStyle.none
         tableView.isEditing = false
+        newListTextField.addTarget(self, action: #selector(newListTextFieldChangeDetected), for: .allEditingEvents)
+        addNewListButton.isEnabled = false
     }
     
+    func newListTextFieldChangeDetected(_ textField: UITextField) {
+        if newListTextField.text == "" {
+            addNewListButton.isEnabled = false
+        } else {
+            addNewListButton.isEnabled = true
+        }
+    }
+
     func insertData() {
         performFetch()
     }
     // MARK: - Table view data source
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let lists = coreDelegate.fetchedResultsControllerLists.fetchedObjects else { return 0 }
+        guard let lists = coreDelegate.fetchedResultsControllerListsShared.fetchedObjects else { return 0 }
         return lists.count
     }
     
@@ -104,7 +118,7 @@ class SharedListViewController: UIViewController, UITableViewDataSource, UITable
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ListCellModel.reuseIdentifier, for: indexPath) as? ListCellModel else {
             fatalError("Unexpected Index Path")
         }
-        let list = coreDelegate.fetchedResultsControllerLists.object(at: indexPath)
+        let list = coreDelegate.fetchedResultsControllerListsShared.object(at: indexPath)
         // Configure the cell...
         cell.listName.text = list.listname
         cell.listContentView.layer.borderWidth = 1
@@ -128,7 +142,7 @@ class SharedListViewController: UIViewController, UITableViewDataSource, UITable
         print("listname: \(listname!)")
         if editingStyle == .delete {
             // Delete the list from the core data
-            coreDelegate.removeList(entitynaam: "Lists", listname: listname!,  fromList: "plist")
+            coreDelegate.removeList(entitynaam: "Lists", listname: listname!,  fromList: "slist")
             // Delete the row from the tableView
             performFetch()
             tableView.reloadData()
@@ -147,7 +161,7 @@ class SharedListViewController: UIViewController, UITableViewDataSource, UITable
     
     // Override to support rearranging the table view.
     func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        var lists = coreDelegate.fetchedResultsControllerLists.fetchedObjects
+        var lists = coreDelegate.fetchedResultsControllerListsShared.fetchedObjects
         
         let rowToMove = lists?[fromIndexPath.row]
         lists!.remove(at: fromIndexPath.row)
@@ -170,11 +184,11 @@ class SharedListViewController: UIViewController, UITableViewDataSource, UITable
         switch segue.identifier! {
         case "segueSharedToItems":
             if let indexPath = tableView.indexPathForSelectedRow {
-                let object = coreDelegate.fetchedResultsControllerLists.object(at: indexPath)
+                let object = coreDelegate.fetchedResultsControllerListsShared.object(at: indexPath)
                 let controller = (segue.destination as! UINavigationController).topViewController as! ItemListViewController
                 controller.items = object
                 controller.listName = object.listname
-
+                controller.entity = "shared"
                 controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
