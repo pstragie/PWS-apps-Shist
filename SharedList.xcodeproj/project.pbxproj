@@ -7,60 +7,60 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F54977EC1FAD355C0047B538 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977EB1FAD355C0047B538 /* CoreDataManager.swift */; };
-		F54977EE1FAFC80E0047B538 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977ED1FAFC80E0047B538 /* DetailViewController.swift */; };
 		F54977F01FAFDDA30047B538 /* MyPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977EF1FAFDDA30047B538 /* MyPickerView.swift */; };
-		F54977F41FB133740047B538 /* ListCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54977F31FB133740047B538 /* ListCellModel.swift */; };
 		F55578831FBCE513003E0CC4 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = F55578821FBCE513003E0CC4 /* Model.swift */; };
 		F55578861FBCE574003E0CC4 /* Lijst.swift in Sources */ = {isa = PBXBuildFile; fileRef = F55578851FBCE574003E0CC4 /* Lijst.swift */; };
 		F55578881FBCE5AE003E0CC4 /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F55578871FBCE5AE003E0CC4 /* UserInfo.swift */; };
 		F5600C161FBBBE5000E25C62 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5600C151FBBBE5000E25C62 /* CloudKit.framework */; };
-		F5600C181FBBC57000E25C62 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5600C171FBBC57000E25C62 /* LoginViewController.swift */; };
-		F5600C1A1FBCAFFF00E25C62 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5600C191FBCAFFF00E25C62 /* SettingsViewController.swift */; };
-		F58C1EAF1FBE4EF6007E9DA0 /* PersonalListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F58C1EAE1FBE4EF6007E9DA0 /* PersonalListViewController.swift */; };
-		F58C1EB11FBE4F0E007E9DA0 /* SharedListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F58C1EB01FBE4F0E007E9DA0 /* SharedListViewController.swift */; };
-		F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60411FA709B800402480 /* AppDelegate.swift */; };
-		F5AD60441FA709B800402480 /* ItemListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60431FA709B800402480 /* ItemListViewController.swift */; };
 		F5AD60491FA709B800402480 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5AD60471FA709B800402480 /* Main.storyboard */; };
 		F5AD604B1FA709B800402480 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5AD604A1FA709B800402480 /* Assets.xcassets */; };
 		F5AD604E1FA709B800402480 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5AD604C1FA709B800402480 /* LaunchScreen.storyboard */; };
-		F5AD60561FA70CD400402480 /* CellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60551FA70CD400402480 /* CellModel.swift */; };
-		F5AD60581FA744EC00402480 /* UserHeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AD60571FA744EC00402480 /* UserHeaderTableViewCell.swift */; };
 		F5AD605B1FA75C8200402480 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5AD605A1FA75C8200402480 /* CoreData.framework */; };
 		F5AD60611FA7884400402480 /* dataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F5AD605C1FA75CC700402480 /* dataModel.xcdatamodeld */; };
 		F5B324291FBA6BAC000FC5EF /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B324281FBA6BAB000FC5EF /* StoreKit.framework */; };
 		F5B3242B1FBA6D7B000FC5EF /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B3242A1FBA6D7B000FC5EF /* UserNotifications.framework */; };
-		F5B3242D1FBA7E3D000FC5EF /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B3242C1FBA7E3D000FC5EF /* ImageViewController.swift */; };
+		F5FA623F1FC2145000A40BB0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA62331FC2145000A40BB0 /* AppDelegate.swift */; };
+		F5FA62401FC2145000A40BB0 /* CellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA62341FC2145000A40BB0 /* CellModel.swift */; };
+		F5FA62411FC2145000A40BB0 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA62351FC2145000A40BB0 /* CoreDataManager.swift */; };
+		F5FA62421FC2145000A40BB0 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA62361FC2145000A40BB0 /* DetailViewController.swift */; };
+		F5FA62431FC2145000A40BB0 /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA62371FC2145000A40BB0 /* ImageViewController.swift */; };
+		F5FA62441FC2145000A40BB0 /* ItemListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA62381FC2145000A40BB0 /* ItemListViewController.swift */; };
+		F5FA62451FC2145000A40BB0 /* ListCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA62391FC2145000A40BB0 /* ListCellModel.swift */; };
+		F5FA62461FC2145000A40BB0 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA623A1FC2145000A40BB0 /* LoginViewController.swift */; };
+		F5FA62471FC2145000A40BB0 /* PersonalListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA623B1FC2145000A40BB0 /* PersonalListViewController.swift */; };
+		F5FA62481FC2145000A40BB0 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA623C1FC2145000A40BB0 /* SettingsViewController.swift */; };
+		F5FA62491FC2145000A40BB0 /* SharedListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA623D1FC2145000A40BB0 /* SharedListViewController.swift */; };
+		F5FA624A1FC2145000A40BB0 /* UserHeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FA623E1FC2145000A40BB0 /* UserHeaderTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		F54977EB1FAD355C0047B538 /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
-		F54977ED1FAFC80E0047B538 /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		F54977EF1FAFDDA30047B538 /* MyPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyPickerView.swift; sourceTree = "<group>"; };
-		F54977F31FB133740047B538 /* ListCellModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListCellModel.swift; sourceTree = "<group>"; };
 		F55578821FBCE513003E0CC4 /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		F55578851FBCE574003E0CC4 /* Lijst.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lijst.swift; sourceTree = "<group>"; };
 		F55578871FBCE5AE003E0CC4 /* UserInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		F5600C151FBBBE5000E25C62 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
-		F5600C171FBBC57000E25C62 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
-		F5600C191FBCAFFF00E25C62 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
-		F58C1EAE1FBE4EF6007E9DA0 /* PersonalListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalListViewController.swift; sourceTree = "<group>"; };
-		F58C1EB01FBE4F0E007E9DA0 /* SharedListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharedListViewController.swift; sourceTree = "<group>"; };
 		F5AD603E1FA709B800402480 /* SharedList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SharedList.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F5AD60411FA709B800402480 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F5AD60431FA709B800402480 /* ItemListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemListViewController.swift; sourceTree = "<group>"; };
 		F5AD60481FA709B800402480 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F5AD604A1FA709B800402480 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F5AD604D1FA709B800402480 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F5AD604F1FA709B800402480 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F5AD60551FA70CD400402480 /* CellModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellModel.swift; sourceTree = "<group>"; };
-		F5AD60571FA744EC00402480 /* UserHeaderTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserHeaderTableViewCell.swift; sourceTree = "<group>"; };
 		F5AD605A1FA75C8200402480 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		F5AD605D1FA75CC700402480 /* dataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = dataModel.xcdatamodel; sourceTree = "<group>"; };
 		F5B324271FBA6BA2000FC5EF /* SharedList.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SharedList.entitlements; sourceTree = "<group>"; };
 		F5B324281FBA6BAB000FC5EF /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		F5B3242A1FBA6D7B000FC5EF /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
-		F5B3242C1FBA7E3D000FC5EF /* ImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
+		F5FA62331FC2145000A40BB0 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F5FA62341FC2145000A40BB0 /* CellModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellModel.swift; sourceTree = "<group>"; };
+		F5FA62351FC2145000A40BB0 /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
+		F5FA62361FC2145000A40BB0 /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		F5FA62371FC2145000A40BB0 /* ImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
+		F5FA62381FC2145000A40BB0 /* ItemListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemListViewController.swift; sourceTree = "<group>"; };
+		F5FA62391FC2145000A40BB0 /* ListCellModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListCellModel.swift; sourceTree = "<group>"; };
+		F5FA623A1FC2145000A40BB0 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		F5FA623B1FC2145000A40BB0 /* PersonalListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalListViewController.swift; sourceTree = "<group>"; };
+		F5FA623C1FC2145000A40BB0 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		F5FA623D1FC2145000A40BB0 /* SharedListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharedListViewController.swift; sourceTree = "<group>"; };
+		F5FA623E1FC2145000A40BB0 /* UserHeaderTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserHeaderTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,9 +91,9 @@
 		F5600C1B1FBCB05E00E25C62 /* Cell Models */ = {
 			isa = PBXGroup;
 			children = (
-				F54977F31FB133740047B538 /* ListCellModel.swift */,
-				F5AD60551FA70CD400402480 /* CellModel.swift */,
-				F5AD60571FA744EC00402480 /* UserHeaderTableViewCell.swift */,
+				F5FA623E1FC2145000A40BB0 /* UserHeaderTableViewCell.swift */,
+				F5FA62341FC2145000A40BB0 /* CellModel.swift */,
+				F5FA62391FC2145000A40BB0 /* ListCellModel.swift */,
 			);
 			name = "Cell Models";
 			sourceTree = "<group>";
@@ -136,15 +136,15 @@
 		F5AD60401FA709B800402480 /* SharedList */ = {
 			isa = PBXGroup;
 			children = (
-				F58C1EAE1FBE4EF6007E9DA0 /* PersonalListViewController.swift */,
-				F58C1EB01FBE4F0E007E9DA0 /* SharedListViewController.swift */,
-				F5AD60411FA709B800402480 /* AppDelegate.swift */,
-				F54977EB1FAD355C0047B538 /* CoreDataManager.swift */,
-				F5AD60431FA709B800402480 /* ItemListViewController.swift */,
-				F54977ED1FAFC80E0047B538 /* DetailViewController.swift */,
-				F5B3242C1FBA7E3D000FC5EF /* ImageViewController.swift */,
-				F5600C171FBBC57000E25C62 /* LoginViewController.swift */,
-				F5600C191FBCAFFF00E25C62 /* SettingsViewController.swift */,
+				F5FA62331FC2145000A40BB0 /* AppDelegate.swift */,
+				F5FA62351FC2145000A40BB0 /* CoreDataManager.swift */,
+				F5FA623B1FC2145000A40BB0 /* PersonalListViewController.swift */,
+				F5FA623D1FC2145000A40BB0 /* SharedListViewController.swift */,
+				F5FA62381FC2145000A40BB0 /* ItemListViewController.swift */,
+				F5FA62361FC2145000A40BB0 /* DetailViewController.swift */,
+				F5FA62371FC2145000A40BB0 /* ImageViewController.swift */,
+				F5FA623A1FC2145000A40BB0 /* LoginViewController.swift */,
+				F5FA623C1FC2145000A40BB0 /* SettingsViewController.swift */,
 				F5AD604C1FA709B800402480 /* LaunchScreen.storyboard */,
 				F5AD60471FA709B800402480 /* Main.storyboard */,
 				F5AD604A1FA709B800402480 /* Assets.xcassets */,
@@ -254,23 +254,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5FA62471FC2145000A40BB0 /* PersonalListViewController.swift in Sources */,
+				F5FA62421FC2145000A40BB0 /* DetailViewController.swift in Sources */,
+				F5FA623F1FC2145000A40BB0 /* AppDelegate.swift in Sources */,
+				F5FA62431FC2145000A40BB0 /* ImageViewController.swift in Sources */,
+				F5FA62451FC2145000A40BB0 /* ListCellModel.swift in Sources */,
 				F55578831FBCE513003E0CC4 /* Model.swift in Sources */,
-				F54977F41FB133740047B538 /* ListCellModel.swift in Sources */,
+				F5FA62441FC2145000A40BB0 /* ItemListViewController.swift in Sources */,
 				F5AD60611FA7884400402480 /* dataModel.xcdatamodeld in Sources */,
-				F5AD60421FA709B800402480 /* AppDelegate.swift in Sources */,
-				F58C1EAF1FBE4EF6007E9DA0 /* PersonalListViewController.swift in Sources */,
+				F5FA62481FC2145000A40BB0 /* SettingsViewController.swift in Sources */,
 				F55578881FBCE5AE003E0CC4 /* UserInfo.swift in Sources */,
-				F5AD60581FA744EC00402480 /* UserHeaderTableViewCell.swift in Sources */,
+				F5FA62401FC2145000A40BB0 /* CellModel.swift in Sources */,
+				F5FA62491FC2145000A40BB0 /* SharedListViewController.swift in Sources */,
 				F54977F01FAFDDA30047B538 /* MyPickerView.swift in Sources */,
-				F5AD60441FA709B800402480 /* ItemListViewController.swift in Sources */,
-				F54977EC1FAD355C0047B538 /* CoreDataManager.swift in Sources */,
-				F5600C1A1FBCAFFF00E25C62 /* SettingsViewController.swift in Sources */,
-				F5AD60561FA70CD400402480 /* CellModel.swift in Sources */,
+				F5FA62411FC2145000A40BB0 /* CoreDataManager.swift in Sources */,
+				F5FA62461FC2145000A40BB0 /* LoginViewController.swift in Sources */,
 				F55578861FBCE574003E0CC4 /* Lijst.swift in Sources */,
-				F5B3242D1FBA7E3D000FC5EF /* ImageViewController.swift in Sources */,
-				F58C1EB11FBE4F0E007E9DA0 /* SharedListViewController.swift in Sources */,
-				F5600C181FBBC57000E25C62 /* LoginViewController.swift in Sources */,
-				F54977EE1FAFC80E0047B538 /* DetailViewController.swift in Sources */,
+				F5FA624A1FC2145000A40BB0 /* UserHeaderTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

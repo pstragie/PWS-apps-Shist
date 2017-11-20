@@ -19,11 +19,11 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
     var personalItemsViewController: ItemListViewController? = nil
     var locationManager: CLLocationManager!
     // MARK: - IBOutlets
-    @IBOutlet weak var editButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var newListTextField: UITextField!
     @IBOutlet weak var addNewListButton: UIButton!
     
+    @IBOutlet weak var privateLabel: UILabel!
+    @IBOutlet weak var sideView: UIView!
     // MARK: - IBActions
     @IBAction func editButton(_ sender: UIButton) {
         if tableView.isEditing == true {
@@ -33,13 +33,14 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
         }
     }
     @IBAction func addNewList(_ sender: UIButton) {
-        coreDelegate.addNewList("Lists", input: newListTextField.text!, storage: "personal")
+        
         performFetch()
         tableView.reloadData()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadList), name: NSNotification.Name(rawValue: "reload"), object: nil)
         let startIndexPath:IndexPath = IndexPath(row: 0, section: 0)
         tableView.selectRow(at: startIndexPath, animated: true, scrollPosition: .none)
         if let split = self.splitViewController {
@@ -72,6 +73,9 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
     }
     
     // MARK: - Functions
+    func reloadList() {
+        self.tableView.reloadData()
+    }
     func performFetch() {
         do {
             try coreDelegate.fetchedResultsControllerListsPersonal.performFetch()
@@ -81,22 +85,104 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
         }
     }
     
+
     func setupLayout() {
+        self.view.layer.backgroundColor = UIColor.lightGray.cgColor
         self.tableView.separatorStyle = UITableViewCellSeparatorStyle.none
         tableView.isEditing = false
-        newListTextField.addTarget(self, action: #selector(newListTextFieldChangeDetected), for: .allEditingEvents)
+        sideView.layer.backgroundColor = UIColor.Palette.blueVar5.cgColor
+        privateLabel.tintColor = UIColor.white
+        privateLabel.transform = CGAffineTransform(rotationAngle: -CGFloat.pi/2)
+        privateLabel.font.withSize(30)
+        privateLabel.adjustsFontSizeToFitWidth = true
+        privateLabel.textAlignment = .center
         addNewListButton.isEnabled = false
+        
     }
     
-    func newListTextFieldChangeDetected(_ textField: UITextField) {
-        if newListTextField.text == "" {
-            addNewListButton.isEnabled = false
-        } else {
-            addNewListButton.isEnabled = true
-        }
-    }
     func insertData() {
         performFetch()
+    }
+    
+    func reminderPassed(listname:String, list:Lists) -> Bool {
+        let moc = self.appDelegate.persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
+        let predicate = NSPredicate(format: "lists.listname == %@", listname)
+        request.predicate = predicate
+        request.resultType = .dictionaryResultType
+        request.propertiesToFetch = ["item"]
+        var resultsDict: Array<Dictionary<String,Any>> = [[:]]
+        do {
+            let result = try moc.fetch(request)
+            resultsDict = result as! [[String:Any]]
+        } catch {
+            print("error fetching: \(error.localizedDescription)")
+        }
+        
+        for r in resultsDict {
+            let item = r["item"] as! String
+            // fetch duedate & duedateSet from Personal
+            let newRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
+            let subpred1 = NSPredicate(format: "lists.listname == %@", listname)
+            let subpred2 = NSPredicate(format: "item == %@", item)
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpred1, subpred2])
+            newRequest.predicate = predicate
+            do {
+                let fetchedItems = try moc.execute(newRequest)
+                print("fetch: \(fetchedItems)")
+                
+            } catch {
+                print("Could not fetch")
+            }
+            // if duedateSet == true and duedate interval < 0 -> return true
+        }
+        
+        return false
+    }
+    
+    func getCount(listname:String) -> Dictionary<String,Int> {
+        let moc = self.appDelegate.persistentContainer.viewContext
+        var itemSum: Int = 0
+        var plannedSum: Int = 0
+        var doneSum: Int = 0
+        var result:Dictionary<String,Int> = [:]
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
+        let predicate = NSPredicate(format: "lists.listname == %@", listname)
+        request.predicate = predicate
+        request.resultType = .dictionaryResultType
+        request.propertiesToFetch = ["item", "planned", "done"]
+        
+        do {
+            let result = try moc.fetch(request)
+            let resultsDict = result as! [[String: Any]]
+            for r in resultsDict {
+                if r["item"] as! String != "" {
+                    itemSum += 1
+                }
+                plannedSum += r["planned"] as! Int
+                doneSum += r["done"] as! Int
+            }
+        } catch {
+            print("error fetching: \(error.localizedDescription)")
+        }
+        result["items"] = itemSum
+        result["planned"] = plannedSum
+        result["done"] = doneSum
+        return result
+    }
+    func countItems(lijstnaam:String) -> Int {
+        // fetch items in each list
+        let result = getCount(listname: lijstnaam)
+        return result["items"]!
+    }
+    func countPlanned(lijstnaam:String) -> Int {
+        let planned = getCount(listname: lijstnaam)["planned"]
+        return planned!
+    }
+    
+    func countDone(lijstnaam:String) -> Int {
+        let done = getCount(listname: lijstnaam)["done"]
+        return done!
     }
     // MARK: - Table view data source
     
@@ -119,10 +205,33 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
         }
         let list = coreDelegate.fetchedResultsControllerListsPersonal.object(at: indexPath)
         // Configure the cell...
+        cell.delegatePersonalCell = self
+        
         cell.listName.text = list.listname
-        cell.listContentView.layer.borderWidth = 1
-        cell.listContentView.layer.cornerRadius = 10
-        cell.listContentView.layer.backgroundColor = UIColor.Palette.blueVar1.cgColor
+        cell.cellView.layer.borderWidth = 1
+        cell.cellView.layer.cornerRadius = 10
+        let itemtotal:Int = countItems(lijstnaam: list.listname!)
+        let plannedtotal:Int = countPlanned(lijstnaam: list.listname!)
+        let donetotal:Int = countDone(lijstnaam: list.listname!)
+        if donetotal == itemtotal && donetotal != 0 {
+            cell.cellView.layer.shadowColor = UIColor.green.cgColor
+            cell.cellView.layer.shadowRadius = 6
+            cell.cellView.layer.shadowOffset = CGSize.zero
+            cell.cellView.layer.shadowOpacity = 1.0
+        } else if reminderPassed(listname: list.listname!, list: list) == true {
+            cell.cellView.layer.shadowColor = UIColor.red.cgColor
+            cell.cellView.layer.shadowRadius = 6
+            cell.cellView.layer.shadowOffset = CGSize.zero
+            cell.cellView.layer.shadowOpacity = 1.0
+        } else if plannedtotal == itemtotal && plannedtotal != 0 {
+            cell.cellView.layer.shadowColor = UIColor.yellow.cgColor
+            cell.cellView.layer.shadowRadius = 6
+            cell.cellView.layer.shadowOffset = CGSize.zero
+            cell.cellView.layer.shadowOpacity = 1.0
+        } else {
+            cell.cellView.layer.shadowOpacity = 0.0
+        }
+        cell.numberOfItems.text = "\(itemtotal) items, \(plannedtotal) planned, \(donetotal) done"
         return cell
      }
     

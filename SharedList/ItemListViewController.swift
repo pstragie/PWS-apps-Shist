@@ -286,6 +286,7 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
             let sharedItem = coreDelegate.fetchedResultsControllerShared.object(at: index)
             sharedItem.setValue(bool, forKey: "planned")
         }
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reload"), object: nil)
         coreDelegate.saveContext()
     }
     
@@ -297,6 +298,7 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
             let sharedItem = coreDelegate.fetchedResultsControllerShared.object(at: index)
             sharedItem.setValue(bool, forKey: "done")
         }
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reload"), object: nil)
         coreDelegate.saveContext()
     }
     
