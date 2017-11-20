@@ -81,6 +81,8 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
     override func viewDidLoad() {
         super.viewDidLoad()
         print("view did load")
+        //tableView.estimatedRowHeight = 44
+        //tableView.rowHeight = UITableViewAutomaticDimension
         configureView()
         // Do any additional setup after loading the view, typically from a nib.
         moc = appDelegate.persistentContainer.viewContext
@@ -106,6 +108,7 @@ class ItemListViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
+        tableView.reloadData()
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()

@@ -235,7 +235,7 @@ class DetailViewController: UIViewController {
         print("insertData, listname = \(listName)")
         var headerArray: Array<String> = []
         let moc = appDelegate.persistentContainer.viewContext
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: entity!)
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: entity!.capitalized)
         request.resultType = .dictionaryResultType
         request.predicate = NSPredicate(format: "lists.listname == %@", listName)
         request.propertiesToFetch = ["header"]

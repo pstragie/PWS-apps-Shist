@@ -2,11 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "bell ringing 40x40.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "bell ringing 40x40.png",
       "scale" : "2x"
     },
     {

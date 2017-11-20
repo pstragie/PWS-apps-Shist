@@ -89,6 +89,7 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
     func setupLayout() {
         self.view.layer.backgroundColor = UIColor.lightGray.cgColor
         self.tableView.separatorStyle = UITableViewCellSeparatorStyle.none
+        self.navigationController?.title = "Private lists"
         tableView.isEditing = false
         sideView.layer.backgroundColor = UIColor.Palette.blueVar5.cgColor
         privateLabel.tintColor = UIColor.white
@@ -123,18 +124,38 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
             let item = r["item"] as! String
             // fetch duedate & duedateSet from Personal
             let newRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Personal")
+            let sortDescriptor = [NSSortDescriptor(key: "item", ascending: true)]
+            newRequest.sortDescriptors = sortDescriptor
             let subpred1 = NSPredicate(format: "lists.listname == %@", listname)
             let subpred2 = NSPredicate(format: "item == %@", item)
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [subpred1, subpred2])
             newRequest.predicate = predicate
+            //let aFetchedItemController = NSFetchedResultsController(fetchRequest: newRequest, managedObjectContext: moc, sectionNameKeyPath: nil, cacheName: nil)
+            var set: Bool = false
+            var date: NSDate?
+            var interval: Double = 0.0
+            var result = [Personal]()
             do {
-                let fetchedItems = try moc.execute(newRequest)
-                print("fetch: \(fetchedItems)")
+                let records = try moc.fetch(newRequest)
+                if let records = records as? [Personal] {
+                    result = records
+                }
+                if let itemRecord = result.first {
+                    set = itemRecord.duedateSet
+                    if set == true {
+                        date = itemRecord.duedate
+                        interval = (date?.timeIntervalSinceNow)!
+                    }
+                }
+                
                 
             } catch {
                 print("Could not fetch")
             }
             // if duedateSet == true and duedate interval < 0 -> return true
+            if set == true && interval < 0.0 {
+                return true
+            }
         }
         
         return false
@@ -208,8 +229,6 @@ final class PersonalListViewController: UIViewController, UITableViewDataSource,
         cell.delegatePersonalCell = self
         
         cell.listName.text = list.listname
-        cell.cellView.layer.borderWidth = 1
-        cell.cellView.layer.cornerRadius = 10
         let itemtotal:Int = countItems(lijstnaam: list.listname!)
         let plannedtotal:Int = countPlanned(lijstnaam: list.listname!)
         let donetotal:Int = countDone(lijstnaam: list.listname!)
